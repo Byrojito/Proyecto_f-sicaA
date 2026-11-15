@@ -23,9 +23,11 @@ Medición propia (portátil enchufado, unos 15 minutos):
 python medicion/benchmark.py --duracion 900 --nombre <tu_nombre>
 ```
 
-Guarda un CSV en `medicion/datos/` con hashes por segundo, temperatura y frecuencia
-contra el tiempo. En Linux la temperatura se lee sola; en Windows registrar en paralelo
-con HWiNFO y en macOS con `sudo powermetrics` (ver comentarios del script).
+Guarda un CSV en `medicion/datos/` con hora, hashes por segundo, temperatura y
+frecuencia contra el tiempo. Después de la carga sigue registrando 5 minutos en reposo
+(fase de enfriamiento). En Linux la temperatura se lee sola; en Windows hay que
+registrarla en paralelo con HWiNFO64 y en macOS con `sudo powermetrics`. Los dos
+archivos se unen por la columna `hora`.
 
 ## Estructura
 

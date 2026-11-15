@@ -4,7 +4,12 @@ Medición propia: velocidad de hashes (y temperatura, si se puede) contra el tie
 Pone a todos los núcleos del portátil a calcular hashes SHA-256 durante un tiempo
 fijo y guarda cada segundo un registro en CSV:
 
-    t_s, hashes_total, hashes_por_s, temp_C, freq_MHz
+    hora, t_s, fase, hashes_total, hashes_por_s, temp_C, freq_MHz
+
+La columna "hora" (reloj del computador) sirve para unir este CSV con el de un
+programa externo de temperatura (HWiNFO en Windows) que registra al mismo tiempo.
+Al final, el script deja la CPU en reposo unos minutos (fase "enfriamiento") y
+sigue registrando: esa curva de enfriamiento es la forma más limpia de medir tau.
 
 Si el chip se calienta y se frena (throttling), se verá como una caída de
 hashes_por_s y de freq_MHz mientras temp_C sube. Con esos datos ajustamos la
@@ -14,11 +19,13 @@ Uso (portátil ENCHUFADO, sin otros programas pesados abiertos):
 
     python medicion/benchmark.py --duracion 900
     python medicion/benchmark.py --duracion 900 --nombre felipe
+    python medicion/benchmark.py --duracion 900 --enfriamiento 300 --nombre felipe
 
 Temperatura:
 - Linux: se lee automáticamente con psutil (pip install psutil).
-- Windows: psutil no da temperatura. Registrar en paralelo con HWiNFO
-  ("Logging start" -> CSV) y unir por tiempo.
+- Windows: psutil no da temperatura. Abrir HWiNFO64 (modo "Sensors-only"),
+  iniciar el registro a CSV ("Logging start") ANTES de correr este script y
+  detenerlo cuando termine. Los dos CSV se unen por la columna "hora".
 - macOS: psutil no da temperatura. Se puede usar `sudo powermetrics` en otra
   terminal, o quedarse solo con hashes/s y frecuencia.
 """
@@ -75,6 +82,8 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__,
                                      formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("--duracion", type=float, default=900, help="segundos (por defecto 900 = 15 min)")
+    parser.add_argument("--enfriamiento", type=float, default=300,
+                        help="segundos registrando en reposo al final (por defecto 300)")
     parser.add_argument("--intervalo", type=float, default=1.0, help="segundos entre registros")
     parser.add_argument("--procesos", type=int, default=os.cpu_count(), help="procesos en paralelo")
     parser.add_argument("--lote", type=int, default=20_000, help="hashes por lote de cada proceso")
@@ -96,32 +105,43 @@ def main():
           f"{'sí' if leer_temperatura() is not None else 'no disponible'}")
     print(f"Guardando en {salida}\n")
 
+    def fila(escritor, t, fase, total, tasa):
+        temp, freq = leer_temperatura(), leer_frecuencia()
+        hora = datetime.now().isoformat(sep=" ", timespec="milliseconds")
+        escritor.writerow([hora, round(t, 3), fase, total, round(tasa, 1), temp, freq])
+        return temp, freq
+
     with open(salida, "w", newline="") as archivo:
         escritor = csv.writer(archivo)
-        escritor.writerow(["t_s", "hashes_total", "hashes_por_s", "temp_C", "freq_MHz"])
-
-        # registro inicial en reposo
-        escritor.writerow([0.0, 0, 0.0, leer_temperatura(), leer_frecuencia()])
+        escritor.writerow(["hora", "t_s", "fase", "hashes_total", "hashes_por_s", "temp_C", "freq_MHz"])
 
         for p in procesos:
             p.start()
         t0 = time.perf_counter()
+        fila(escritor, 0.0, "carga", 0, 0.0)
         t_prev, total_prev = t0, 0
+        fase = "carga"
 
         try:
             while True:
                 time.sleep(args.intervalo)
                 ahora = time.perf_counter()
+                t = ahora - t0
                 total = sum(contadores)
                 tasa = (total - total_prev) / (ahora - t_prev)
-                temp, freq = leer_temperatura(), leer_frecuencia()
-                escritor.writerow([round(ahora - t0, 3), total, round(tasa, 1), temp, freq])
+                temp, freq = fila(escritor, t, fase, total, tasa)
                 archivo.flush()
-                print(f"\rt = {ahora - t0:6.0f} s | {tasa:12,.0f} hash/s | "
+                print(f"\r[{fase:12s}] t = {t:6.0f} s | {tasa:12,.0f} hash/s | "
                       f"T = {temp if temp is not None else '--'} °C | "
-                      f"f = {freq if freq is not None else '--'} MHz", end="")
+                      f"f = {freq if freq is not None else '--'} MHz   ", end="")
                 t_prev, total_prev = ahora, total
-                if ahora - t0 >= args.duracion:
+                if fase == "carga" and t >= args.duracion:
+                    parar.set()
+                    for p in procesos:
+                        p.join()
+                    fase = "enfriamiento"
+                    total_prev = sum(contadores)
+                if t >= args.duracion + args.enfriamiento:
                     break
         except KeyboardInterrupt:
             print("\nInterrumpido; se guardó lo medido hasta ahora.")
