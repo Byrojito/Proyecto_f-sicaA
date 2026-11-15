@@ -29,6 +29,16 @@ frecuencia contra el tiempo. Después de la carga sigue registrando 5 minutos en
 registrarla en paralelo con HWiNFO64 y en macOS con `sudo powermetrics`. Los dos
 archivos se unen por la columna `hora`.
 
+Protocolo para que las mediciones sean comparables:
+
+1. Cerrar todo (navegador, juegos, Discord) y dejar el equipo en reposo unos 5 minutos.
+2. En HWiNFO: *Settings → Scan interval = 1000 ms*; abrir *Sensors-only* e iniciar el
+   registro a CSV.
+3. Esperar 30 s y correr `python medicion/benchmark.py --duracion 900 --nombre <nombre>_<modo>`.
+4. No tocar el equipo hasta que termine (unos 20 min). Detener el registro de HWiNFO.
+5. Guardar los dos archivos en `medicion/datos/` como `<nombre>_<modo>_benchmark.csv` y
+   `<nombre>_<modo>_hwinfo.csv`.
+
 ## Estructura
 
 ```
@@ -49,7 +59,11 @@ esté junto a su código y su interpretación.
       convergencia (orden 1) y estabilidad (Δt > τ oscila, Δt > 2τ diverge)
 - [ ] **Fase 2** — Frenado térmico f(T) (on/off vs. proporcional) y acoplamiento con el
       ataque: intentos y energía acumulados hasta cubrir 95^N combinaciones
-- [ ] **Fase 3** — Medición propia con `benchmark.py` (los tres portátiles) y ajuste de τ
+- [ ] **Fase 3** — Medición propia con `benchmark.py` y HWiNFO, ajuste de τ con la curva de
+      enfriamiento
+  - [x] Felipe, modo Silencio (τ ≈ 44 s, R_th ≈ 1.2 K/W)
+  - [ ] Felipe, modos Rendimiento y Turbo
+  - [ ] Alejandra y Samuel
 - [ ] **Fase 4** — Barridos (N, tipo de hash, R_th, T_amb), costo en kWh y pesos, Landauer
 - [ ] **Fase 5** — Notebook como ensayo: limitaciones, conclusiones, declaración de IA;
       verificar que "Restart & Run All" corre sin errores
