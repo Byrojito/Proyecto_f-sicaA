@@ -62,7 +62,8 @@ esté junto a su código y su interpretación.
 - [ ] **Fase 3** — Medición propia con `benchmark.py` y HWiNFO, ajuste de τ con la curva de
       enfriamiento
   - [x] Felipe, modo Silencio (τ ≈ 44 s, R_th ≈ 1.2 K/W)
-  - [ ] Felipe, modos Rendimiento y Turbo
+  - [x] Felipe, modos Rendimiento y Turbo (Turbo: +22 % velocidad, +30 % energía por hash;
+        P = C·V²·f confirmado con C ≈ 12 nF en los tres modos)
   - [ ] Alejandra y Samuel
 - [ ] **Fase 4** — Barridos (N, tipo de hash, R_th, T_amb), costo en kWh y pesos, Landauer
 - [ ] **Fase 5** — Notebook como ensayo: limitaciones, conclusiones, declaración de IA;
