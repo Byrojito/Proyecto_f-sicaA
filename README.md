@@ -57,15 +57,16 @@ esté junto a su código y su interpretación.
 
 - [x] **Fase 1** — Balance de energía, Euler propio, validación con solución analítica,
       convergencia (orden 1) y estabilidad (Δt > τ oscila, Δt > 2τ diverge)
-- [ ] **Fase 2** — Frenado térmico f(T) (on/off vs. proporcional) y acoplamiento con el
-      ataque: intentos y energía acumulados hasta cubrir 95^N combinaciones
+- [x] **Fase 2** — Frenado con dos frenos (tope de potencia y límite térmico, on/off vs.
+      proporcional), P(φ) calibrada con la medición, validación del equilibrio por bisección,
+      τ efectivo con freno, y acoplamiento con el ataque (T, intentos y energía con Euler)
 - [ ] **Fase 3** — Medición propia con `benchmark.py` y HWiNFO, ajuste de τ con la curva de
       enfriamiento
   - [x] Felipe, modo Silencio (τ ≈ 44 s, R_th ≈ 1.2 K/W)
   - [x] Felipe, modos Rendimiento y Turbo (Turbo: +22 % velocidad, +30 % energía por hash;
         P = C·V²·f confirmado con C ≈ 12 nF en los tres modos)
   - [ ] Alejandra y Samuel
-- [ ] **Fase 4** — Barridos (N, tipo de hash, R_th, T_amb), costo en kWh y pesos, Landauer
+- [ ] **Fase 4** — Barridos de R_th y T_amb, costo en pesos, Landauer
 - [ ] **Fase 5** — Notebook como ensayo: limitaciones, conclusiones, declaración de IA;
       verificar que "Restart & Run All" corre sin errores
 - [ ] **Fase 6** — Demo interactiva (ipywidgets), póster y ensayo de la sustentación
