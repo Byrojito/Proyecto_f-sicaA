@@ -65,7 +65,9 @@ esté junto a su código y su interpretación.
   - [x] Felipe, modo Silencio (τ ≈ 44 s, R_th ≈ 1.2 K/W)
   - [x] Felipe, modos Rendimiento y Turbo (Turbo: +22 % velocidad, +30 % energía por hash;
         P = C·V²·f confirmado con C ≈ 12 nF en los tres modos)
-  - [ ] Alejandra y Samuel
+  - [x] Alejandra, modos Silencio y Rendimiento (5.9 µJ/hash, C ≈ 9.5 nF, R_th ≈ 2 K/W,
+        freno térmico observado; τ de calentamiento ≈ 10 s vs. enfriamiento ≈ 33 s)
+  - [ ] Samuel
 - [ ] **Fase 4** — Barridos de R_th y T_amb, costo en pesos, Landauer
 - [ ] **Fase 5** — Notebook como ensayo: limitaciones, conclusiones, declaración de IA;
       verificar que "Restart & Run All" corre sin errores
