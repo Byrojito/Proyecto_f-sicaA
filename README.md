@@ -68,7 +68,13 @@ esté junto a su código y su interpretación.
   - [x] Alejandra, modos Silencio y Rendimiento (5.9 µJ/hash, C ≈ 9.5 nF, R_th ≈ 2 K/W,
         freno térmico observado; τ de calentamiento ≈ 10 s vs. enfriamiento ≈ 33 s)
   - [ ] Samuel
-- [ ] **Fase 4** — Barridos de R_th y T_amb, costo en pesos, Landauer
-- [ ] **Fase 5** — Notebook como ensayo: limitaciones, conclusiones, declaración de IA;
-      verificar que "Restart & Run All" corre sin errores
-- [ ] **Fase 6** — Demo interactiva (ipywidgets), póster y ensayo de la sustentación
+- [x] **Fase 4** — Costo en pesos (Enel, estrato 4), barridos de R_th y T_amb, límite de
+      Landauer (≈ 215 bits / 33 caracteres aleatorios superan la energía del Sol en su vida)
+- [ ] **Fase 5** — Notebook como ensayo
+  - [x] Limitaciones y conclusiones (borrador para revisar entre los tres)
+  - [ ] Declaración de uso de IA: completar qué hizo cada integrante
+  - [x] "Restart & Run All" corre sin errores
+- [ ] **Fase 6** — Presentación
+  - [x] Demo interactiva (sección 13)
+  - [ ] Póster
+  - [ ] Ensayo de la sustentación
