@@ -139,7 +139,8 @@
     <div class="campo">
       <select id="hash" style="flex:1">
         <option value="NTLM">NTLM (contraseñas de Windows) · 3×10¹¹ intentos/s</option>
-        <option value="bcrypt">bcrypt (hash lento) · 2×10⁵ intentos/s</option>
+        <option value="bcrypt">bcrypt costo 5 (benchmark) · 2×10⁵ intentos/s</option>
+        <option value="bcrypt12">bcrypt costo 12 (sitio real) · 1,6×10³ intentos/s</option>
       </select>
     </div>
     <div class="cifras">
@@ -151,7 +152,7 @@
         <div class="progreso" style="margin-top:8px"><div id="barra"></div></div>
         <div class="n" id="c-gastado">0 Wh gastados</div>
       </div>
-      <div class="cifra ancha"><div class="k">Piso de Landauer (computador perfecto)</div><div class="v" id="c-landauer">—</div><div class="n" id="c-landauer-n">—</div></div>
+      <div class="cifra ancha"><div class="k">Piso de Landauer (computador irreversible perfecto)</div><div class="v" id="c-landauer">—</div><div class="n" id="c-landauer-n">—</div></div>
     </div>
     <table class="escalera" id="escalera" aria-label="Tiempo según la longitud"></table>
   </section>
@@ -196,7 +197,7 @@
 "use strict";
 // ---------- Parámetros del notebook (secciones 3, 9, 10, 11, 12) ----------
 const P_MAX = 450, C_TH = 600, T_LIM = 83, PHI_MIN = 0.5, K_FRENO = 0.10, A_DVFS = 0.311;
-const VEL_HASH = { NTLM: 3e11, bcrypt: 2e5 };
+const VEL_HASH = { NTLM: 3e11, bcrypt: 2e5, bcrypt12: 2e5 / 2 ** 7 };
 const COP = 3, TARIFA = 863.61, ANIO = 3.156e7;
 const K_B = 1.380649e-23, E_BIT = K_B * 300 * Math.LN2, E_HUMANIDAD = 6.0e20;
 const DT = 0.5, T_FIN_CARGA = 900, T_FIN = 1200;
@@ -363,7 +364,7 @@ function recalcular() {
   $("c-kwh").textContent = (kwh < 1e4 ? kwh.toPrecision(3).replace(".", ",") : cient(kwh)) + " kWh con aire acondicionado";
   const EL = Math.pow(2, bits) * E_BIT;
   $("c-landauer").textContent = cient(EL) + " J";
-  $("c-landauer-n").textContent = EL > E_HUMANIDAD ? `${cient(EL / E_HUMANIDAD)} años de toda la energía de la humanidad` : `ni con un computador perfecto baja de aquí`;
+  $("c-landauer-n").textContent = EL > E_HUMANIDAD ? `${cient(EL / E_HUMANIDAD)} años de toda la energía de la humanidad` : `ningún computador irreversible baja de aquí`;
   // escalera de longitudes con el mismo alfabeto
   let filas = ""; for (let n = Math.max(1, N - 3); n <= N + 3; n++) {
     const r = ataque(n * Math.log10(a.n), rmax, md.Rth, md.Tamb, md.phiDe);
