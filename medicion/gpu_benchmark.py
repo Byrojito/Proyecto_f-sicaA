@@ -247,6 +247,15 @@ def main():
                 hc.proc.terminate()
             gpu.parar()
 
+    # Guardar todo lo que dijo hashcat, para poder diagnosticar
+    registro = salida.replace(".csv", "_hashcat.log")
+    with open(registro, "w", encoding="utf-8") as f:
+        f.write("Comando: " + " ".join(hc.cmd) + "\n\n" + "\n".join(hc.otras) + "\n")
+    if not hc.velocidad:
+        print("\n\nOJO: hashcat nunca reportó velocidad, así que la GPU no estuvo atacando.")
+        print("Últimos mensajes de hashcat:")
+        print("\n".join("  " + l for l in hc.otras[-15:]) or "  (ninguno)")
+        print(f"Todo lo que dijo hashcat quedó en {registro}")
     print(f"\nGPU: {hc.dispositivo} | Listo: {salida}")
 
 
