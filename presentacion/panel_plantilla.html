@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Fuerza bruta: modelo vs. realidad</title>
+<style>
+  :root {
+    color-scheme: dark;
+    --surface-0: #111110;
+    --surface-1: #1a1a19;
+    --surface-2: #232321;
+    --line: #383835;
+    --text-primary: #f0efec;
+    --text-secondary: #c3c2b7;
+    --text-muted: #8f8e86;
+    --s-blue: #3987e5;
+    --s-orange: #d95926;
+    --s-aqua: #199e70;
+    --s-yellow: #c98500;
+    --st-warning: #fab219;
+    --st-critical: #d03b3b;
+    --st-good: #0ca30c;
+    --mono: ui-monospace, "SF Mono", "Cascadia Mono", Consolas, monospace;
+    --sans: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; height: 100%; background: var(--surface-0); color: var(--text-primary); font-family: var(--sans); }
+  body { display: flex; flex-direction: column; min-height: 100vh; }
+
+  header {
+    display: flex; align-items: center; gap: 24px; padding: 14px 22px;
+    border-bottom: 1px solid var(--line); flex-wrap: wrap;
+  }
+  header h1 { font-size: 19px; font-weight: 600; margin: 0; letter-spacing: -0.01em; }
+  header .sub { color: var(--text-muted); font-size: 13px; margin-top: 2px; }
+  .reloj { margin-left: auto; display: flex; align-items: center; gap: 10px; }
+  .reloj .t { font-family: var(--mono); font-size: 26px; font-variant-numeric: tabular-nums; min-width: 92px; text-align: right; }
+  .reloj .fase { font-size: 12px; color: var(--text-secondary); text-transform: uppercase; letter-spacing: .08em; min-width: 110px; }
+  button, select, input {
+    font: inherit; color: var(--text-primary); background: var(--surface-2);
+    border: 1px solid var(--line); border-radius: 6px; padding: 6px 10px;
+  }
+  button { cursor: pointer; }
+  button:hover, select:hover { border-color: var(--text-muted); }
+  button.primario { background: var(--s-blue); border-color: var(--s-blue); color: #fff; font-weight: 600; min-width: 96px; }
+  .segmentos { display: inline-flex; border: 1px solid var(--line); border-radius: 6px; overflow: hidden; }
+  .segmentos button { border: 0; border-radius: 0; background: transparent; padding: 6px 10px; color: var(--text-secondary); }
+  .segmentos button.activo { background: var(--surface-2); color: var(--text-primary); }
+
+  main { flex: 1 0 auto; display: grid; grid-template-columns: 1fr 1.15fr 1.15fr; gap: 14px; padding: 14px; align-items: start; }
+  @media (max-width: 1100px) { main { grid-template-columns: 1fr; } }
+  section {
+    background: var(--surface-1); border: 1px solid var(--line); border-radius: 12px;
+    padding: 16px 18px; display: flex; flex-direction: column; gap: 12px; min-width: 0;
+  }
+  .etiqueta { font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: var(--text-muted); }
+  section h2 { font-size: 17px; margin: 2px 0 0; font-weight: 600; }
+  .ecuacion { font-family: var(--mono); font-size: 13px; color: var(--text-secondary); background: var(--surface-2); border-radius: 6px; padding: 8px 10px; }
+
+  .campo { display: flex; gap: 8px; }
+  .campo input { flex: 1; font-family: var(--mono); font-size: 17px; padding: 9px 12px; }
+  .chips { display: flex; gap: 6px; flex-wrap: wrap; }
+  .chip { font-size: 12px; padding: 3px 8px; border-radius: 999px; border: 1px solid var(--line); color: var(--text-muted); }
+  .chip.si { color: var(--text-primary); border-color: var(--text-secondary); }
+  .aviso { font-size: 12px; color: var(--text-muted); }
+
+  .cifras { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .cifra { background: var(--surface-2); border-radius: 8px; padding: 10px 12px; }
+  .cifra .k { font-size: 12px; color: var(--text-secondary); }
+  .cifra .v { font-family: var(--mono); font-size: 22px; font-variant-numeric: tabular-nums; margin-top: 3px; line-height: 1.15; }
+  .cifra .n { font-size: 12px; color: var(--text-muted); margin-top: 3px; }
+  .cifra.ancha { grid-column: span 2; }
+
+  .progreso { height: 8px; background: var(--surface-2); border-radius: 4px; overflow: hidden; }
+  .progreso > div { height: 100%; width: 0; background: var(--s-blue); border-radius: 4px; }
+  .estado-rota { display: none; font-weight: 600; color: var(--st-critical); }
+  .estado-rota.si { display: inline; }
+
+  table.escalera { width: 100%; border-collapse: collapse; font-size: 13px; font-variant-numeric: tabular-nums; }
+  .escalera td { padding: 3px 6px; border-bottom: 1px solid var(--line); color: var(--text-secondary); }
+  .escalera td:last-child { text-align: right; font-family: var(--mono); }
+  .escalera tr.actual td { color: var(--text-primary); background: var(--surface-2); font-weight: 600; }
+
+  .controles { display: grid; grid-template-columns: auto 1fr auto; gap: 6px 10px; align-items: center; font-size: 13px; color: var(--text-secondary); }
+  .controles input[type=range] { width: 100%; accent-color: var(--s-blue); padding: 0; border: 0; background: none; }
+  .controles output { font-family: var(--mono); color: var(--text-primary); min-width: 70px; text-align: right; }
+
+  .grafica { position: relative; }
+  .grafica canvas { width: 100%; display: block; }
+  .grafica .titulo { font-size: 12px; color: var(--text-secondary); margin-bottom: 2px; display: flex; justify-content: space-between; }
+  .grafica .titulo b { font-family: var(--mono); font-weight: 500; color: var(--text-primary); }
+  .tooltip {
+    position: absolute; pointer-events: none; background: var(--surface-0); border: 1px solid var(--line);
+    border-radius: 6px; padding: 5px 8px; font-size: 12px; font-family: var(--mono); white-space: nowrap; display: none; z-index: 5;
+  }
+  .leyenda { display: flex; gap: 14px; font-size: 12px; color: var(--text-secondary); flex-wrap: wrap; }
+  .leyenda i { display: inline-block; width: 14px; height: 2px; vertical-align: middle; margin-right: 6px; }
+  .leyenda i.punto { width: 8px; height: 8px; border-radius: 50%; }
+
+  .freno { display: flex; gap: 8px; flex-wrap: wrap; }
+  .insignia { font-size: 12px; padding: 4px 9px; border-radius: 6px; border: 1px solid var(--line); color: var(--text-muted); }
+  .insignia.termico { border-color: var(--st-critical); color: var(--text-primary); }
+  .insignia.termico::before { content: "▲ "; color: var(--st-critical); }
+  .insignia.potencia { border-color: var(--st-warning); color: var(--text-primary); }
+  .insignia.potencia::before { content: "■ "; color: var(--st-warning); }
+  .insignia.ninguno::before { content: "● "; color: var(--st-good); }
+  .vivo { color: var(--st-critical); font-weight: 600; }
+  footer { padding: 8px 22px 12px; font-size: 12px; color: var(--text-muted); }
+</style>
+</head>
+<body>
+<header>
+  <div>
+    <h1>¿Cuánta energía cuesta romper una contraseña?</h1>
+    <div class="sub">Física A · Hardware e Información · Rojas · Rodríguez · Fonseca</div>
+  </div>
+  <div class="reloj">
+    <button class="primario" id="play">▶ Iniciar</button>
+    <button id="reiniciar" title="Reiniciar (R)">↺</button>
+    <div class="segmentos" id="velocidades">
+      <button data-v="1">×1</button><button data-v="10" class="activo">×10</button><button data-v="30">×30</button>
+    </div>
+    <div class="t" id="reloj">0:00</div>
+    <div class="fase" id="fase">listo</div>
+  </div>
+</header>
+
+<main>
+  <!-- 1. EL ATAQUE -->
+  <section>
+    <div><div class="etiqueta">1 · El ataque</div><h2>Lo que quiere el atacante</h2></div>
+    <div class="campo">
+      <input id="clave" type="password" value="Uniandes2026" autocomplete="off" spellcheck="false" aria-label="Contraseña de prueba">
+      <button id="ver" title="Mostrar u ocultar">👁</button>
+    </div>
+    <div class="chips" id="chips"></div>
+    <div class="aviso">No escribas una contraseña real. Todo se calcula en esta página; nada se envía.</div>
+    <div class="campo">
+      <select id="hash" style="flex:1">
+        <option value="NTLM">NTLM (contraseñas de Windows) · 3×10¹¹ intentos/s</option>
+        <option value="bcrypt">bcrypt (hash lento) · 2×10⁵ intentos/s</option>
+      </select>
+    </div>
+    <div class="cifras">
+      <div class="cifra"><div class="k">Tiempo (peor caso)</div><div class="v" id="c-tiempo">—</div><div class="n" id="c-prom">—</div></div>
+      <div class="cifra"><div class="k">Costo en la factura</div><div class="v" id="c-pesos">—</div><div class="n" id="c-kwh">—</div></div>
+      <div class="cifra ancha">
+        <div class="k">Durante la simulación <span class="estado-rota" id="rota">· ¡CONTRASEÑA ENCONTRADA!</span></div>
+        <div class="v" id="c-intentos">0 intentos</div>
+        <div class="progreso" style="margin-top:8px"><div id="barra"></div></div>
+        <div class="n" id="c-gastado">0 Wh gastados</div>
+      </div>
+      <div class="cifra ancha"><div class="k">Piso de Landauer (computador perfecto)</div><div class="v" id="c-landauer">—</div><div class="n" id="c-landauer-n">—</div></div>
+    </div>
+    <table class="escalera" id="escalera" aria-label="Tiempo según la longitud"></table>
+  </section>
+
+  <!-- 2. EL MODELO -->
+  <section>
+    <div><div class="etiqueta">2 · El modelo</div><h2>GPU simulada con Euler (RTX 4090)</h2></div>
+    <div class="ecuacion">C<sub>th</sub>·dT/dt = P(φ) − (T − T<sub>amb</sub>)/R<sub>th</sub> &nbsp;·&nbsp; φ = min(φ<sub>tope</sub>, φ<sub>térmico</sub>(T))</div>
+    <div class="controles">
+      <label for="r-rth">Disipador R<sub>th</sub></label><input id="r-rth" type="range" min="0.06" max="0.25" step="0.01" value="0.18"><output id="o-rth"></output>
+      <label for="r-tamb">Cuarto T<sub>amb</sub></label><input id="r-tamb" type="range" min="15" max="40" step="1" value="25"><output id="o-tamb"></output>
+      <label for="r-tope">Tope de potencia</label><input id="r-tope" type="range" min="200" max="450" step="10" value="450"><output id="o-tope"></output>
+      <label for="s-control">Freno térmico</label>
+      <select id="s-control" style="grid-column: span 2"><option value="proporcional">Proporcional</option><option value="on/off">Encendido/apagado</option><option value="ninguno">Sin freno térmico</option></select>
+    </div>
+    <div class="grafica"><div class="titulo"><span>Temperatura del chip (°C)</span><b id="m-T">—</b></div><canvas id="g-modelo-T" height="190"></canvas></div>
+    <div class="grafica"><div class="titulo"><span>Frecuencia (% del máximo) = velocidad del ataque</span><b id="m-phi">—</b></div><canvas id="g-modelo-phi" height="110"></canvas></div>
+    <div class="cifras">
+      <div class="cifra"><div class="k">τ = R<sub>th</sub>·C<sub>th</sub></div><div class="v" id="m-tau">—</div></div>
+      <div class="cifra"><div class="k">Potencia ahora</div><div class="v" id="m-P">—</div></div>
+    </div>
+  </section>
+
+  <!-- 3. LA REALIDAD -->
+  <section>
+    <div><div class="etiqueta">3 · La realidad</div><h2>Lo que medimos con HWiNFO</h2></div>
+    <div class="campo">
+      <select id="fuente" style="flex:1"></select>
+      <label class="campo" style="flex:0"><input type="file" id="archivo" accept=".csv" style="display:none"><button id="cargar" type="button">Cargar CSV</button></label>
+    </div>
+    <div class="freno" id="freno"><span class="insignia">sin datos</span></div>
+    <div class="grafica"><div class="titulo"><span>Temperatura medida (°C)</span><b id="r-T">—</b></div><canvas id="g-real-T" height="150"></canvas></div>
+    <div class="grafica"><div class="titulo"><span>Potencia del chip (W)</span><b id="r-P">—</b></div><canvas id="g-real-P" height="95"></canvas></div>
+    <div class="grafica"><div class="titulo"><span>Velocidad (hashes/s)</span><b id="r-r">—</b></div><canvas id="g-real-r" height="95"></canvas></div>
+    <div class="leyenda"><span><i class="punto" style="background:var(--st-critical)"></i>freno térmico activo</span><span><i style="background:var(--text-muted)"></i>zona gris = reposo (enfriamiento)</span></div>
+  </section>
+</main>
+<footer>Espacio: iniciar/pausar · R: reiniciar · Las tres columnas comparten el mismo reloj: el ataque avanza con la velocidad que da el modelo, y la medición real se reproduce al mismo ritmo.</footer>
+
+<script id="datos-medidos" type="application/json">__MEDIDAS__</script>
+<script>
+"use strict";
+// ---------- Parámetros del notebook (secciones 3, 9, 10, 11, 12) ----------
+const P_MAX = 450, C_TH = 600, T_LIM = 83, PHI_MIN = 0.5, K_FRENO = 0.10, A_DVFS = 0.311;
+const VEL_HASH = { NTLM: 3e11, bcrypt: 2e5 };
+const COP = 3, TARIFA = 863.61, ANIO = 3.156e7;
+const K_B = 1.380649e-23, E_BIT = K_B * 300 * Math.LN2, E_HUMANIDAD = 6.0e20;
+const DT = 0.5, T_FIN_CARGA = 900, T_FIN = 1200;
+
+const $ = id => document.getElementById(id);
+const css = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+
+// ---------- Física ----------
+const potencia = phi => P_MAX * phi * (A_DVFS + (1 - A_DVFS) * phi) ** 2;
+function biseccion(g, a, b) { let ga = g(a); while (b - a > 1e-9) { const m = (a + b) / 2, gm = g(m); if ((gm > 0) === (ga > 0)) { a = m; ga = gm; } else b = m; } return (a + b) / 2; }
+function reglaFrenado(Ptope, control) {
+  const phiP = Ptope >= P_MAX ? 1 : biseccion(p => potencia(p) - Ptope, 0, 1);
+  return T => {
+    let phiT = 1;
+    if (control === "proporcional") phiT = Math.min(1, Math.max(PHI_MIN, 1 - K_FRENO * (T - T_LIM)));
+    else if (control === "on/off") phiT = T > T_LIM ? PHI_MIN : 1;
+    return Math.min(phiP, phiT);
+  };
+}
+function alfabeto(s) {
+  const g = { minúsculas: /[a-zñ]/.test(s) ? 26 : 0, mayúsculas: /[A-ZÑ]/.test(s) ? 26 : 0, dígitos: /[0-9]/.test(s) ? 10 : 0, símbolos: /[^a-zA-Z0-9ñÑ]/.test(s) ? 33 : 0 };
+  return { grupos: g, n: Object.values(g).reduce((a, b) => a + b, 0) };
+}
+// Tiempo y energía del ataque completo: Euler 20τ y luego velocidad de equilibrio (sección 10.1)
+function ataque(log10total, rmax, Rth, Tamb, phiDe) {
+  const total = 10 ** log10total;
+  const dt = 0.1, tSim = 20 * Rth * C_TH;
+  let t = 0, n = 0, E = 0, T = Tamb;
+  while (t < tSim) {
+    const ph = phiDe(T), r = rmax * ph, P = potencia(ph);
+    if (n + dt * r >= total) { const f = (total - n) / r; return { t: t + f, E: E + P * f }; }
+    T += dt * (P - (T - Tamb) / Rth) / C_TH; n += dt * r; E += dt * P; t += dt;
+  }
+  const ph = phiDe(T), r = rmax * ph, P = potencia(ph), resto = (total - n) / r;
+  return { t: t + resto, E: E + P * resto };
+}
+// Simulación visible: carga hasta que se rompe la clave o termina la ventana, luego reposo
+function simular(Rth, Tamb, phiDe, rmax, total) {
+  const n = Math.round(T_FIN / DT) + 1;
+  const t = new Float64Array(n), T = new Float64Array(n), phi = new Float64Array(n), P = new Float64Array(n), N = new Float64Array(n), E = new Float64Array(n);
+  T[0] = Tamb; let rota = null;
+  for (let k = 0; k < n; k++) {
+    t[k] = k * DT;
+    const carga = t[k] < T_FIN_CARGA && rota === null;
+    phi[k] = carga ? phiDe(T[k]) : 0;
+    P[k] = carga ? potencia(phi[k]) : 0;
+    if (k + 1 < n) {
+      T[k + 1] = T[k] + DT * (P[k] - (T[k] - Tamb) / Rth) / C_TH;
+      N[k + 1] = N[k] + DT * rmax * phi[k];
+      E[k + 1] = E[k] + DT * P[k];
+      if (rota === null && N[k + 1] >= total) { rota = t[k] + (total - N[k]) / (rmax * phi[k]); N[k + 1] = total; }
+    }
+  }
+  return { t, T, phi, P, N, E, rota };
+}
+
+// ---------- Formato ----------
+function tiempoLegible(s) {
+  if (s < 1) return "< 1 s";
+  if (s < 60) return s.toFixed(1) + " s";
+  if (s < 3600) return (s / 60).toFixed(1) + " min";
+  if (s < 86400) return (s / 3600).toFixed(1) + " h";
+  if (s < ANIO) return (s / 86400).toFixed(1) + " días";
+  if (s < 1e4 * ANIO) return Math.round(s / ANIO).toLocaleString("es-CO") + " años";
+  return cient(s / ANIO) + " años";
+}
+function cient(x) { if (!isFinite(x)) return "∞"; const e = Math.floor(Math.log10(x)); return (x / 10 ** e).toFixed(1).replace(".", ",") + "×10" + sup(e); }
+function sup(e) { const m = { "-": "⁻", 0: "⁰", 1: "¹", 2: "²", 3: "³", 4: "⁴", 5: "⁵", 6: "⁶", 7: "⁷", 8: "⁸", 9: "⁹" }; return String(e).split("").map(c => m[c]).join(""); }
+function pesos(c) {
+  if (c < 1) return "menos de $1";
+  if (c < 1e6) return "$" + Math.round(c).toLocaleString("es-CO");
+  if (c < 1e12) return "$" + (c / 1e6).toLocaleString("es-CO", { maximumFractionDigits: 1 }) + " millones";
+  return "$" + cient(c);
+}
+function energia(J) { const Wh = J / 3600; if (Wh < 1000) return Wh.toFixed(Wh < 10 ? 2 : 0).replace(".", ",") + " Wh"; return (Wh / 1000).toLocaleString("es-CO", { maximumFractionDigits: 1 }) + " kWh"; }
+function grande(x) { if (x < 1e6) return Math.round(x).toLocaleString("es-CO"); return cient(x); }
+function mmss(s) { s = Math.max(0, s); return Math.floor(s / 60) + ":" + String(Math.floor(s % 60)).padStart(2, "0"); }
+
+// ---------- Gráficas en canvas (una escala por gráfica, sin doble eje) ----------
+function prepararCanvas(cv) {
+  const r = window.devicePixelRatio || 1, w = cv.clientWidth, h = +cv.getAttribute("height");
+  if (cv.width !== Math.round(w * r)) { cv.width = Math.round(w * r); cv.height = Math.round(h * r); cv.style.height = h + "px"; }
+  const ctx = cv.getContext("2d"); ctx.setTransform(r, 0, 0, r, 0, 0); return { ctx, w, h };
+}
+function dibujar(cv, op) {
+  const { ctx, w, h } = prepararCanvas(cv);
+  const m = { l: 40, r: 8, t: 6, b: 18 }, W = w - m.l - m.r, H = h - m.t - m.b;
+  const X = x => m.l + (x - op.x0) / (op.x1 - op.x0) * W, Y = y => m.t + (1 - (y - op.y0) / (op.y1 - op.y0)) * H;
+  ctx.clearRect(0, 0, w, h);
+  ctx.font = "11px " + css("--sans");
+  // zonas sombreadas
+  for (const z of op.zonas || []) { ctx.fillStyle = "rgba(143,142,134,0.12)"; ctx.fillRect(X(z[0]), m.t, X(z[1]) - X(z[0]), H); }
+  // rejilla y ejes
+  ctx.strokeStyle = css("--line"); ctx.fillStyle = css("--text-muted"); ctx.lineWidth = 1;
+  for (const y of op.yticks) { ctx.beginPath(); ctx.moveTo(m.l, Y(y) + .5); ctx.lineTo(w - m.r, Y(y) + .5); ctx.stroke(); ctx.textAlign = "right"; ctx.fillText(op.yfmt ? op.yfmt(y) : y, m.l - 6, Y(y) + 4); }
+  if (op.xticks) { ctx.textAlign = "center"; for (const x of op.xticks) ctx.fillText(mmss(x), X(x), h - 4); }
+  // líneas de referencia
+  for (const r of op.ref || []) {
+    ctx.setLineDash([4, 4]); ctx.strokeStyle = css("--text-muted"); ctx.beginPath(); ctx.moveTo(m.l, Y(r.y)); ctx.lineTo(w - m.r, Y(r.y)); ctx.stroke(); ctx.setLineDash([]);
+    ctx.textAlign = "left"; ctx.fillStyle = css("--text-secondary"); ctx.fillText(r.texto, m.l + 4, Y(r.y) - 4);
+  }
+  // series: tenue completa + intensa hasta "ahora"
+  ctx.save(); ctx.beginPath(); ctx.rect(m.l, m.t - 2, W, H + 4); ctx.clip();
+  for (const s of op.series) {
+    for (const fase of s.fantasma ? ["fantasma", "real"] : ["real"]) {
+      ctx.beginPath(); let empezo = false;
+      for (let i = 0; i < s.x.length; i++) {
+        const y = s.y[i]; if (y == null || isNaN(y)) { empezo = false; continue; }
+        if (fase === "real" && s.x[i] > op.ahora) break;
+        const px = X(s.x[i]), py = Y(y);
+        if (!empezo) { ctx.moveTo(px, py); empezo = true; } else ctx.lineTo(px, py);
+      }
+      ctx.strokeStyle = s.color; ctx.globalAlpha = fase === "fantasma" ? 0.22 : 1; ctx.lineWidth = 2; ctx.lineJoin = "round"; ctx.stroke(); ctx.globalAlpha = 1;
+    }
+    if (s.marcas) for (let i = 0; i < s.x.length && s.x[i] <= op.ahora; i++) if (s.marcas[i]) {
+      ctx.beginPath(); ctx.arc(X(s.x[i]), Y(s.y[i]), 4, 0, 2 * Math.PI);
+      ctx.fillStyle = css("--st-critical"); ctx.fill(); ctx.lineWidth = 2; ctx.strokeStyle = css("--surface-1"); ctx.stroke();
+    }
+  }
+  ctx.restore();
+  // cursor de "ahora"
+  if (op.ahora > op.x0 && op.ahora < op.x1) { ctx.strokeStyle = css("--text-secondary"); ctx.globalAlpha = .5; ctx.beginPath(); ctx.moveTo(X(op.ahora) + .5, m.t); ctx.lineTo(X(op.ahora) + .5, m.t + H); ctx.stroke(); ctx.globalAlpha = 1; }
+  cv._escala = { X, m, W, op };
+}
+// Tooltip con cruz: busca el punto más cercano en x
+function conTooltip(cv, texto) {
+  const tip = document.createElement("div"); tip.className = "tooltip"; cv.parentElement.appendChild(tip);
+  cv.addEventListener("mousemove", ev => {
+    const e = cv._escala; if (!e) return;
+    const rect = cv.getBoundingClientRect(), px = ev.clientX - rect.left;
+    const x = e.op.x0 + (px - e.m.l) / e.W * (e.op.x1 - e.op.x0);
+    const s = e.op.series[0]; if (!s || !s.x.length) return;
+    let i = 0, lo = 0, hi = s.x.length - 1; while (lo < hi) { const md = (lo + hi) >> 1; if (s.x[md] < x) lo = md + 1; else hi = md; } i = lo;
+    const t = texto(i, s); if (!t) { tip.style.display = "none"; return; }
+    tip.innerHTML = t; tip.style.display = "block";
+    tip.style.left = Math.min(px + 12, rect.width - tip.offsetWidth) + "px"; tip.style.top = (ev.clientY - rect.top + 22) + "px";
+  });
+  cv.addEventListener("mouseleave", () => tip.style.display = "none");
+}
+
+// ---------- Estado ----------
+const estado = { t: 0, corriendo: false, vel: 10, sim: null, real: null, vivo: false, atk: null };
+const medidas = JSON.parse($("datos-medidos").textContent);
+
+function leerModelo() {
+  const Rth = +$("r-rth").value, Tamb = +$("r-tamb").value, tope = +$("r-tope").value, control = $("s-control").value;
+  $("o-rth").textContent = Rth.toFixed(2) + " K/W"; $("o-tamb").textContent = Tamb + " °C"; $("o-tope").textContent = tope + " W";
+  return { Rth, Tamb, phiDe: reglaFrenado(tope, control) };
+}
+
+function recalcular() {
+  const clave = $("clave").value, a = alfabeto(clave), N = [...clave].length;
+  $("chips").innerHTML = Object.entries(a.grupos).map(([k, v]) => `<span class="chip ${v ? "si" : ""}">${k} ${v ? "+" + v : ""}</span>`).join("") +
+    `<span class="chip si">${N} caracteres · alfabeto ${a.n}</span>`;
+  const md = leerModelo(), rmax = VEL_HASH[$("hash").value];
+  $("m-tau").textContent = (md.Rth * C_TH).toFixed(0) + " s";
+  if (!N || !a.n) { estado.atk = null; estado.sim = simular(md.Rth, md.Tamb, md.phiDe, rmax, Infinity); dibujarTodo(); return; }
+  const log10total = N * Math.log10(a.n), bits = N * Math.log2(a.n);
+  const res = ataque(log10total, rmax, md.Rth, md.Tamb, md.phiDe), kwh = res.E * (1 + 1 / COP) / 3.6e6;
+  estado.atk = { log10total, total: 10 ** log10total };
+  $("c-tiempo").textContent = tiempoLegible(res.t);
+  $("c-prom").textContent = "en promedio " + tiempoLegible(res.t / 2) + " · " + bits.toFixed(0) + " bits";
+  $("c-pesos").textContent = pesos(kwh * TARIFA);
+  $("c-kwh").textContent = (kwh < 1e4 ? kwh.toPrecision(3).replace(".", ",") : cient(kwh)) + " kWh con aire acondicionado";
+  const EL = Math.pow(2, bits) * E_BIT;
+  $("c-landauer").textContent = cient(EL) + " J";
+  $("c-landauer-n").textContent = EL > E_HUMANIDAD ? `${cient(EL / E_HUMANIDAD)} años de toda la energía de la humanidad` : `ni con un computador perfecto baja de aquí`;
+  // escalera de longitudes con el mismo alfabeto
+  let filas = ""; for (let n = Math.max(1, N - 3); n <= N + 3; n++) {
+    const r = ataque(n * Math.log10(a.n), rmax, md.Rth, md.Tamb, md.phiDe);
+    filas += `<tr class="${n === N ? "actual" : ""}"><td>${n} caracteres</td><td>${tiempoLegible(r.t)}</td></tr>`;
+  }
+  $("escalera").innerHTML = filas;
+  estado.sim = simular(md.Rth, md.Tamb, md.phiDe, rmax, estado.atk.total);
+  dibujarTodo();
+}
+
+// ---------- Fuente de datos reales ----------
+function serieDesdeMedida(clave) {
+  const d = medidas[clave], s = d.serie;
+  return { etiqueta: d.etiqueta, fin: d.fin_carga, t: s.map(r => r[0]), T: s.map(r => r[1]), P: s.map(r => r[2]), r: s.map(r => r[5]), ft: s.map(r => r[4]), fp: s.map(r => r[7]) };
+}
+function serieDesdeCSV(texto, nombre) {
+  const filas = texto.trim().split(/\r?\n/).map(l => l.split(","));
+  const enc = filas.shift().map(c => c.trim().replace(/^﻿/, ""));
+  const col = (...ns) => { for (const n of ns) { const i = enc.indexOf(n); if (i >= 0) return i; } return -1; };
+  const it = col("t_s"), iT = col("temp_C"), iP = col("potencia_W"), ir = col("hashes_por_s"), ift = col("freno_termico"), ifp = col("freno_potencia"), ifa = col("fase");
+  if (it < 0) throw new Error("El CSV no tiene la columna t_s (usa el de benchmark.py o gpu_benchmark.py)");
+  const num = (f, i) => i < 0 || f[i] === "" || f[i] === undefined ? null : +f[i];
+  const carga = filas.filter(f => ifa < 0 || f[ifa] === "carga");
+  return {
+    etiqueta: nombre, fin: carga.length ? +carga[carga.length - 1][it] : null,
+    t: filas.map(f => +f[it]), T: filas.map(f => num(f, iT)), P: filas.map(f => num(f, iP)), r: filas.map(f => num(f, ir)),
+    ft: ift < 0 ? null : filas.map(f => num(f, ift)), fp: ifp < 0 ? null : filas.map(f => num(f, ifp)),
+  };
+}
+function elegirFuente() {
+  const v = $("fuente").value;
+  estado.vivo = v === "vivo";
+  if (!estado.vivo && medidas[v]) estado.real = serieDesdeMedida(v);
+  dibujarTodo();
+}
+$("cargar").onclick = () => $("archivo").click();
+$("archivo").onchange = async ev => {
+  const f = ev.target.files[0]; if (!f) return;
+  try {
+    estado.real = serieDesdeCSV(await f.text(), f.name);
+    const o = document.createElement("option"); o.value = "csv"; o.textContent = "Archivo: " + f.name; $("fuente").appendChild(o); $("fuente").value = "csv"; estado.vivo = false;
+    dibujarTodo();
+  } catch (e) { alert(e.message); }
+};
+// Modo en vivo: solo existe si la página la sirve presentacion/servidor.py
+async function sondearVivo() {
+  try {
+    const r = await fetch("en_vivo.csv", { cache: "no-store" });
+    if (!r.ok) throw 0;
+    const nombre = r.headers.get("X-Archivo") || "medición en curso";
+    if (!$("fuente").querySelector('option[value="vivo"]')) {
+      const o = document.createElement("option"); o.value = "vivo"; o.textContent = "● EN VIVO: " + nombre; $("fuente").prepend(o); $("fuente").value = "vivo"; estado.vivo = true;
+    }
+    if (estado.vivo) {
+      estado.real = serieDesdeCSV(await r.text(), nombre);
+      const n = estado.real.t.length; if (n) { estado.t = estado.real.t[n - 1]; estado.corriendo = false; }
+      dibujarTodo();
+    }
+    setTimeout(sondearVivo, 1000);
+  } catch (e) { /* abierto como archivo o publicado: sin modo en vivo */ }
+}
+
+// ---------- Dibujo ----------
+function ultimoIndice(t, x) { let lo = 0, hi = t.length - 1, k = -1; while (lo <= hi) { const md = (lo + hi) >> 1; if (t[md] <= x) { k = md; lo = md + 1; } else hi = md - 1; } return k; }
+const ticksT = [0, 300, 600, 900, 1200];
+
+function dibujarTodo() {
+  const s = estado.sim; if (!s) return;
+  const ahora = estado.t, k = Math.min(s.t.length - 1, Math.floor(ahora / DT));
+  const blue = css("--s-blue"), orange = css("--s-orange"), aqua = css("--s-aqua"), yellow = css("--s-yellow");
+  const finCarga = s.rota !== null ? Math.min(s.rota, T_FIN_CARGA) : T_FIN_CARGA;
+
+  // Modelo
+  const ymaxT = Math.max(100, Math.ceil((Math.max(...s.T) + 5) / 10) * 10);
+  dibujar($("g-modelo-T"), { x0: 0, x1: T_FIN, y0: Math.min(20, +$("r-tamb").value - 5), y1: ymaxT, yticks: [20, 40, 60, 80, 100].filter(v => v <= ymaxT), xticks: ticksT, ahora, zonas: [[finCarga, T_FIN]],
+    ref: [{ y: T_LIM, texto: "T_lím = 83 °C: el chip empieza a frenar" }], series: [{ x: s.t, y: s.T, color: orange, fantasma: true }] });
+  dibujar($("g-modelo-phi"), { x0: 0, x1: T_FIN, y0: 0, y1: 105, yticks: [0, 50, 100], yfmt: v => v + " %", ahora, zonas: [[finCarga, T_FIN]],
+    series: [{ x: s.t, y: Array.from(s.phi, v => v * 100), color: blue, fantasma: true }] });
+  $("m-T").textContent = s.T[k].toFixed(1) + " °C"; $("m-phi").textContent = (s.phi[k] * 100).toFixed(0) + " %"; $("m-P").textContent = s.P[k].toFixed(0) + " W";
+
+  // Ataque en curso
+  if (estado.atk) {
+    const frac = s.N[k] / estado.atk.total;
+    $("c-intentos").textContent = grande(s.N[k]) + " intentos";
+    $("barra").style.width = Math.min(100, frac * 100) + "%";
+    const pct = frac * 100;
+    $("c-gastado").textContent = `${pct >= 0.01 ? pct.toFixed(2).replace(".", ",") : pct > 0 ? "<0,01" : "0"} % del espacio · ${energia(s.E[k])} · ${pesos(s.E[k] * (1 + 1 / COP) / 3.6e6 * TARIFA)}`;
+    $("rota").classList.toggle("si", s.rota !== null && ahora >= s.rota);
+  }
+
+  // Realidad
+  const r = estado.real;
+  if (r && r.t.length) {
+    const finR = r.fin ?? Infinity, x1 = Math.max(T_FIN, r.t[r.t.length - 1]);
+    const Ts = r.T.filter(v => v != null), Ps = r.P.filter(v => v != null), Rs = r.r.filter(v => v != null);
+    const marcas = r.ft ? r.ft.map(v => v === 1) : null;
+    const ymx = Ts.length ? Math.ceil((Math.max(...Ts) + 3) / 10) * 10 : 100, ymn = Ts.length ? Math.floor((Math.min(...Ts) - 3) / 10) * 10 : 20;
+    const ticks = (a, b) => { const st = b - a > 40 ? 20 : 10, r = []; for (let v = Math.ceil(a / st) * st; v <= b; v += st) r.push(v); return r; };
+    const zonas = isFinite(finR) ? [[finR, x1]] : [];
+    dibujar($("g-real-T"), { x0: 0, x1, y0: ymn, y1: ymx, yticks: ticks(ymn, ymx), xticks: ticksT, ahora, zonas,
+      series: [{ x: r.t, y: r.T, color: orange, fantasma: !estado.vivo, marcas }] });
+    const pmx = Ps.length ? Math.ceil(Math.max(...Ps) / 10) * 10 : 50;
+    dibujar($("g-real-P"), { x0: 0, x1, y0: 0, y1: pmx, yticks: [0, pmx / 2, pmx], ahora, zonas, series: [{ x: r.t, y: r.P, color: yellow, fantasma: !estado.vivo }] });
+    const rmx = Rs.length ? Math.max(...Rs) * 1.1 : 1;
+    const fmtR = v => v >= 1e9 ? (v / 1e9).toFixed(0) + " G" : v >= 1e6 ? (v / 1e6).toFixed(1) + " M" : v.toFixed(0);
+    dibujar($("g-real-r"), { x0: 0, x1, y0: 0, y1: rmx, yticks: [0, rmx / 2, rmx], yfmt: fmtR, ahora, zonas, series: [{ x: r.t, y: r.r, color: aqua, fantasma: !estado.vivo }] });
+    const j = ultimoIndice(r.t, ahora);
+    const val = (arr, f) => j >= 0 && arr[j] != null ? f(arr[j]) : "—";
+    $("r-T").textContent = val(r.T, v => v.toFixed(0) + " °C"); $("r-P").textContent = val(r.P, v => v.toFixed(1) + " W"); $("r-r").textContent = val(r.r, v => fmtR(v) + "H/s");
+    const term = r.ft && j >= 0 && r.ft[j] === 1, pot = r.fp && j >= 0 && r.fp[j] === 1;
+    $("freno").innerHTML = (estado.vivo ? '<span class="insignia vivo">● EN VIVO</span>' : "") + `<span class="insignia">${r.etiqueta}</span>` +
+      (term ? '<span class="insignia termico">Freno térmico</span>' : "") + (pot ? '<span class="insignia potencia">Tope de potencia</span>' : "") +
+      (!term && !pot && j >= 0 && ahora < finR ? '<span class="insignia ninguno">Sin freno térmico</span>' : "");
+  }
+
+  $("reloj").textContent = mmss(ahora);
+  $("fase").textContent = estado.vivo ? "en vivo" : ahora >= T_FIN ? "terminado" : ahora >= finCarga ? "reposo" : ahora > 0 ? "atacando" : "listo";
+}
+
+// ---------- Reloj compartido ----------
+let ultimo = null;
+function cuadro(ts) {
+  if (estado.corriendo && !estado.vivo) {
+    if (ultimo !== null) estado.t = Math.min(T_FIN, estado.t + (ts - ultimo) / 1000 * estado.vel);
+    if (estado.t >= T_FIN) pausar();
+    dibujarTodo();
+  }
+  ultimo = ts; requestAnimationFrame(cuadro);
+}
+function pausar() { estado.corriendo = false; $("play").textContent = estado.t >= T_FIN ? "▶ De nuevo" : "▶ Seguir"; }
+function alternar() {
+  if (estado.corriendo) return pausar();
+  if (estado.t >= T_FIN) estado.t = 0;
+  estado.corriendo = true; $("play").textContent = "❚❚ Pausa";
+}
+$("play").onclick = alternar;
+$("reiniciar").onclick = () => { estado.t = 0; pausar(); $("play").textContent = "▶ Iniciar"; dibujarTodo(); };
+$("velocidades").onclick = ev => { const b = ev.target.closest("button"); if (!b) return; estado.vel = +b.dataset.v; [...$("velocidades").children].forEach(x => x.classList.toggle("activo", x === b)); };
+document.addEventListener("keydown", ev => {
+  if (ev.target.tagName === "INPUT" || ev.target.tagName === "SELECT") return;
+  if (ev.code === "Space") { ev.preventDefault(); alternar(); }
+  if (ev.key === "r" || ev.key === "R") $("reiniciar").click();
+});
+$("ver").onclick = () => { $("clave").type = $("clave").type === "password" ? "text" : "password"; };
+["clave", "hash", "r-rth", "r-tamb", "r-tope", "s-control"].forEach(id => $(id).addEventListener("input", recalcular));
+$("fuente").onchange = elegirFuente;
+window.addEventListener("resize", dibujarTodo);
+
+// Tooltips
+conTooltip($("g-modelo-T"), (i, s) => `t ${mmss(s.x[i])} · ${s.y[i].toFixed(1)} °C · φ ${(estado.sim.phi[i] * 100).toFixed(0)} %`);
+conTooltip($("g-modelo-phi"), (i, s) => `t ${mmss(s.x[i])} · ${s.y[i].toFixed(0)} % · ${estado.sim.P[i].toFixed(0)} W`);
+const tipReal = (i, s) => { const r = estado.real; if (!r) return ""; const f = v => v == null ? "—" : v;
+  return `t ${mmss(r.t[i])} · ${f(r.T[i])} °C · ${r.P[i] == null ? "—" : r.P[i].toFixed(1)} W${r.ft && r.ft[i] === 1 ? " · ▲ freno térmico" : ""}`; };
+["g-real-T", "g-real-P", "g-real-r"].forEach(id => conTooltip($(id), tipReal));
+
+// Inicio
+for (const [k, d] of Object.entries(medidas)) { const o = document.createElement("option"); o.value = k; o.textContent = d.etiqueta; $("fuente").appendChild(o); }
+estado.real = serieDesdeMedida(Object.keys(medidas)[0]);
+recalcular();
+requestAnimationFrame(cuadro);
+if (location.protocol.startsWith("http") && /^(localhost|127\.0\.0\.1)$/.test(location.hostname)) sondearVivo();
+</script>
+</body>
+</html>
