@@ -175,6 +175,13 @@ def main():
                    help="hashcat se detiene si la GPU pasa de esta temperatura (°C)")
     args = p.parse_args()
 
+    if not os.path.isfile(args.hashcat):
+        print(f"No encuentro hashcat en: {args.hashcat}")
+        print("Revisa que hayas descomprimido el .7z y pasa la ruta completa a hashcat.exe.")
+        print("En PowerShell puedes buscarlo con:")
+        print('  Get-ChildItem $HOME -Recurse -Filter hashcat.exe -ErrorAction SilentlyContinue | Select FullName')
+        return
+
     carpeta = os.path.join(os.path.dirname(os.path.abspath(__file__)), "datos")
     os.makedirs(carpeta, exist_ok=True)
     marca = datetime.now().strftime("%Y%m%d_%H%M%S")
