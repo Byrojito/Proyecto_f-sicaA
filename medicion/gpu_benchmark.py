@@ -32,6 +32,7 @@ import argparse
 import csv
 import json
 import os
+import re
 import secrets
 import subprocess
 import threading
@@ -93,13 +94,42 @@ class LectorGPU(threading.Thread):
         self.proc.terminate()
 
 
-class LectorHashcat(threading.Thread):
-    """Lanza hashcat y guarda la última velocidad reportada (hashes/s sumando dispositivos)."""
+def dispositivos_nvidia(exe):
+    """IDs de hashcat de las GPU NVIDIA, leídos de `hashcat -I`.
 
-    def __init__(self, exe, duracion, temp_abortar):
+    Los portátiles con GPU NVIDIA casi siempre tienen también una gráfica integrada
+    (Intel o AMD). Si hashcat usara las dos, la velocidad registrada sería la suma de
+    ambas, pero nvidia-smi solo mide la potencia y la temperatura de la NVIDIA. Por eso
+    le pasamos a hashcat solo los dispositivos NVIDIA con -d.
+    """
+    salida = subprocess.run([exe, "-I"], cwd=os.path.dirname(os.path.abspath(exe)) or None,
+                            capture_output=True, text=True).stdout
+    encontrados, actual = {}, None
+    for linea in salida.splitlines():
+        if re.search(r"Platform ID|Info:", linea):   # una plataforma nueva no es un dispositivo
+            actual = None
+            continue
+        m = re.search(r"Backend Device ID #(\d+)", linea)
+        if m:
+            actual = int(m.group(1))
+            encontrados[actual] = ""
+            continue
+        m = re.match(r"\s*(Name|Vendor)\.*:\s*(.*)", linea)
+        if m and actual is not None:
+            encontrados[actual] += " " + m.group(2)
+    nvidia = sorted(i for i, texto in encontrados.items()
+                    if re.search(r"NVIDIA|GeForce|RTX|GTX|Quadro", texto, re.I))
+    return nvidia, encontrados
+
+
+class LectorHashcat(threading.Thread):
+    """Lanza hashcat solo en las GPU NVIDIA y guarda la última velocidad reportada (hashes/s)."""
+
+    def __init__(self, exe, duracion, temp_abortar, ids_nvidia):
         super().__init__(daemon=True)
         hash_falso = secrets.token_hex(16)  # 32 hex = formato NTLM; nadie conoce su contraseña
         self.cmd = [exe, "-m", "1000", "-a", "3", hash_falso, "?a?a?a?a?a?a?a?a?a?a",
+                    "-d", ",".join(map(str, ids_nvidia)),
                     "-O", "-w", "3", f"--runtime={int(duracion)}",
                     "--status", "--status-json", "--status-timer=1",
                     "--potfile-disable", "--restore-disable", "--quiet",
@@ -123,6 +153,10 @@ class LectorHashcat(threading.Thread):
             except json.JSONDecodeError:
                 continue
             disp = estado.get("devices", [])
+            # Segunda protección: si hashcat informa el nombre, sumar solo las NVIDIA
+            if any("device_name" in d for d in disp):
+                disp = [d for d in disp
+                        if re.search(r"NVIDIA|GeForce|RTX|GTX|Quadro", d.get("device_name", ""), re.I)]
             self.velocidad = sum(d.get("speed", 0) for d in disp)
             if disp and self.dispositivo is None:
                 self.dispositivo = disp[0].get("device_name")
@@ -154,6 +188,15 @@ def main():
         gpu.parar()
         return
 
+    ids_nvidia, todos = dispositivos_nvidia(args.hashcat)
+    print("Dispositivos que ve hashcat:")
+    for i, texto in todos.items():
+        print(f"  #{i}:{texto}{'   <- se usa' if i in ids_nvidia else ''}")
+    if not ids_nvidia:
+        print("hashcat no encontró ninguna GPU NVIDIA. Revisa el driver o la ruta de hashcat.")
+        gpu.parar()
+        return
+
     print(f"Reposo inicial: T = {gpu.ultima[0]} °C, P = {gpu.ultima[1]} W")
     print(f"Guardando en {salida}\n")
 
@@ -163,7 +206,7 @@ def main():
                       "mem_MHz", "vent_pct", "uso_pct", "freno_potencia", "freno_termico",
                       "motivos_freno"])
 
-        hc = LectorHashcat(args.hashcat, args.duracion, args.temp_abortar)
+        hc = LectorHashcat(args.hashcat, args.duracion, args.temp_abortar, ids_nvidia)
         hc.start()
         t0 = time.perf_counter()
         fase = "carga"
