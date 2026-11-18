@@ -75,6 +75,7 @@ proyecto.ipynb        Entregable: ensayo computacional (texto + código + interp
 medicion/
   benchmark.py        Bucle de hashes en paralelo que registra velocidad vs. tiempo
   gpu_benchmark.py    Ataque real con hashcat en una GPU NVIDIA + registro de nvidia-smi
+  EQUIPOS.md          Hardware de cada integrante y qué medición puede hacer cada equipo
   datos/              CSV medidos por nosotros
 figuras/              Gráficas exportadas para el póster
 docs/                 Chuleta de física y documento completo para la sustentación
