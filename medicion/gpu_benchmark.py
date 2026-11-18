@@ -128,7 +128,9 @@ class LectorHashcat(threading.Thread):
     def __init__(self, exe, duracion, temp_abortar, ids_nvidia):
         super().__init__(daemon=True)
         hash_falso = secrets.token_hex(16)  # 32 hex = formato NTLM; nadie conoce su contraseña
-        self.cmd = [exe, "-m", "1000", "-a", "3", hash_falso, "?a?a?a?a?a?a?a?a?a?a",
+        # Máscara de 9 caracteres: 95^9 ≈ 6×10^17 combinaciones. Con 10 (≈ 6×10^19) se pasa del
+        # límite de un entero de 64 bits y hashcat 8 se niega a empezar. 9 alcanzan para años de ataque.
+        self.cmd = [exe, "-m", "1000", "-a", "3", hash_falso, "?a" * 9,
                     "-d", ",".join(map(str, ids_nvidia)),
                     "-O", "-w", "3", f"--runtime={int(duracion)}",
                     "--status", "--status-json", "--status-timer=1",
