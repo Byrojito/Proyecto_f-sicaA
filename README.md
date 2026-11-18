@@ -10,12 +10,35 @@ balance de energía, se frena cuando supera su temperatura límite, y eso cambia
 tiempo, energía y dinero cuesta el ataque. Al final comparamos con el límite
 termodinámico de Landauer.
 
+[![Pruebas](https://github.com/Byrojito/Proyecto_f-sicaA/actions/workflows/pruebas.yml/badge.svg)](https://github.com/Byrojito/Proyecto_f-sicaA/actions/workflows/pruebas.yml)
+
+## Resultados principales
+
+| Contraseña (NTLM, RTX 4090) | Tiempo | Energía con aire acondicionado | Costo (Enel, estrato 4) |
+| --- | --- | --- | --- |
+| 6 caracteres | 2.5 s | 0.0004 kWh | menos de $1 |
+| 8 caracteres | 6.1 h | 3.69 kWh | $3.183 |
+| 10 caracteres | 6 años | 3.3×10⁴ kWh | $28,7 millones |
+| 12 caracteres | 5.7×10⁴ años | 3×10⁸ kWh | $259.256 millones |
+
+- **La longitud gana a la complejidad:** cada carácter extra multiplica el tiempo, la energía y el costo por 95.
+- **P = C·V²·f, comprobada con datos propios** en dos procesadores (C = 12.0 nF con R² = 0.986, y 9.5 nF).
+- **Frenar cambia tiempo por energía:** con un disipador malo el ataque tarda 14 % más pero gasta 17 % menos.
+- **Límite de Landauer:** recorrer una llave de 256 bits exige más energía que la que emitirá el Sol en toda su vida.
+
+![Tiempo y energía del ataque según la longitud de la contraseña](figuras/ataque_vs_longitud.png)
+
 ## Cómo correrlo
 
 ```bash
 pip install -r requirements.txt
 jupyter notebook proyecto.ipynb      # luego: Kernel -> Restart & Run All
+pytest -v                            # 32 pruebas de la física (también corren solas en GitHub)
 ```
+
+La física también está organizada como paquete de Python en `fisica/`, con cada ecuación traducida a una
+función. La tabla que conecta ecuación, código y prueba está en
+[`docs/ECUACIONES_A_CODIGO.md`](docs/ECUACIONES_A_CODIGO.md).
 
 Medición propia (portátil enchufado, unos 15 minutos):
 
@@ -76,9 +99,11 @@ medicion/
   benchmark.py        Bucle de hashes en paralelo que registra velocidad vs. tiempo
   gpu_benchmark.py    Ataque real con hashcat en una GPU NVIDIA + registro de nvidia-smi
   EQUIPOS.md          Hardware de cada integrante y qué medición puede hacer cada equipo
-  datos/              CSV medidos por nosotros
+  datos/              CSV medidos por nosotros (qué es cada archivo: datos/README.md)
 figuras/              Gráficas exportadas para el póster
-docs/                 Chuleta de física y documento completo para la sustentación
+fisica/               La física del notebook como paquete: térmico, potencia, frenado, ataque, Landauer
+tests/                Pruebas de la física y de reproducción de los resultados del notebook
+docs/                 Ecuaciones → código, chuleta de física y documento completo
 presentacion/
   panel.html          Panel de tres columnas para la sustentación (se abre solo)
   panel_plantilla.html  Fuente del panel (sin datos)
