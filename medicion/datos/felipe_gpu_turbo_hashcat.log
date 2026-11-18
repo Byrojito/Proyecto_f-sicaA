@@ -1,0 +1,15 @@
+Comando: C:\hashcat-8.0.0\hashcat-8.0.0\hashcat.exe -m 1000 -a 3 379d765b3b6b4278016888a8b20ba27d ?a?a?a?a?a?a?a?a?a -d 1 -O -w 3 --runtime=900 --status --status-json --status-timer=1 --potfile-disable --restore-disable --quiet --hwmon-temp-abort=90
+
+Successfully initialized the NVIDIA main driver CUDA runtime library.
+Failed to initialize NVIDIA RTC library.
+* Device #1: CUDA SDK Toolkit not installed or incorrectly installed.
+CUDA SDK Toolkit required for proper device support and utilization.
+For more information, see: https://hashcat.net/faq/wrongdriver
+Falling back to OpenCL runtime.
+The NVIDIA RTC library that hashcat compiles its kernels with comes with the CUDA Toolkit.
+Install the Windows build of it from https://developer.nvidia.com/cuda-downloads, choosing
+Windows and the version of it you are on. The GPU driver on its own does not carry it.
+Running hashcat inside WSL2 reaches CUDA as well, using the Linux build of hashcat and the
+Linux CUDA Toolkit installed inside it. No NVIDIA GPU driver is installed inside WSL2 itself.
+For all details: https://docs.nvidia.com/cuda/wsl-user-guide/index.html
+nvmlDeviceGetFanSpeed(): Not Supported

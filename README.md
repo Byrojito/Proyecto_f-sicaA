@@ -105,7 +105,9 @@ esté junto a su código y su interpretación.
   - [x] Alejandra, modos Silencio y Rendimiento (5.9 µJ/hash, C ≈ 9.5 nF, R_th ≈ 2 K/W,
         freno térmico observado; τ de calentamiento ≈ 10 s vs. enfriamiento ≈ 33 s)
   - [ ] Samuel: ThinkPad T14 (i7-1185G7, solo CPU) en dos modos
-  - [ ] GPU NVIDIA con `gpu_benchmark.py`: Omen de Samuel (RTX 4060 Laptop) y/o TUF de Felipe
+  - [x] GPU del TUF de Felipe (GTX 1650) con hashcat 8.0: 16.5 GH/s en NTLM, 47 W, 2.8 nJ por
+        intento, frenada por potencia; calentamiento con dos escalas de tiempo (6 s y ~210 s)
+  - [ ] GPU del Omen de Samuel (RTX 4060 Laptop), opcional
 - [x] **Fase 4** — Costo en pesos (Enel, estrato 4), barridos de R_th y T_amb, límite de
       Landauer (≈ 215 bits / 33 caracteres aleatorios superan la energía del Sol en su vida)
 - [ ] **Fase 5** — Notebook como ensayo
