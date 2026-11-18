@@ -10,8 +10,6 @@ balance de energía, se frena cuando supera su temperatura límite, y eso cambia
 tiempo, energía y dinero cuesta el ataque. Al final comparamos con el límite
 termodinámico de Landauer.
 
-[![Pruebas](https://github.com/Byrojito/Proyecto_f-sicaA/actions/workflows/pruebas.yml/badge.svg)](https://github.com/Byrojito/Proyecto_f-sicaA/actions/workflows/pruebas.yml)
-
 ## Resultados principales
 
 | Contraseña (NTLM, RTX 4090) | Tiempo | Energía con aire acondicionado | Costo (Enel, estrato 4) |
@@ -33,7 +31,7 @@ termodinámico de Landauer.
 ```bash
 pip install -r requirements.txt
 jupyter notebook proyecto.ipynb      # luego: Kernel -> Restart & Run All
-pytest -v                            # 32 pruebas de la física (también corren solas en GitHub)
+pytest -v                            # 32 pruebas de la física
 ```
 
 La física también está organizada como paquete de Python en `fisica/`, con cada ecuación traducida a una
