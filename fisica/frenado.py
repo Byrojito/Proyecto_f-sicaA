@@ -9,8 +9,9 @@ Con eso P depende de T y el balance de energía deja de ser lineal:
 
     C_th · dT/dt = P(φ(T)) − (T − T_amb)/R_th
 
-No tiene solución exacta sencilla, así que se integra con Euler. El equilibrio se
-verifica aparte resolviendo P(φ(T)) = (T − T_amb)/R_th por bisección.
+No tiene solución exacta sencilla, así que se integra con Euler. Resolver
+P(φ(T)) = (T − T_amb)/R_th por bisección solo confirma que la simulación llegó al equilibrio:
+el punto fijo de Euler cumple esa misma ecuación, así que no es una validación independiente.
 """
 
 import numpy as np

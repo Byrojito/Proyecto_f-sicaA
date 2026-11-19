@@ -13,7 +13,7 @@ encabezados de sus registros de HWiNFO; los de Samuel, del inventario de Windows
 | **Disco** | NVMe Micron 2210, 512 GB | NVMe Intel 660p, 512 GB | NVMe SK hynix, 512 GB | NVMe KIOXIA, 1 TB |
 | **Sistema** | Windows | Windows | Windows 11 Pro | Windows 11 Home |
 | **Medición de CPU** (`benchmark.py`) | Silencio, Rendimiento, Turbo | Silencio, Rendimiento | Pendiente (dos modos) | — |
-| **Medición de GPU** (`gpu_benchmark.py`) | Posible (GTX 1650) | No tiene GPU NVIDIA | No tiene GPU NVIDIA | Pendiente (RTX 4060) |
+| **Medición de GPU** (`gpu_benchmark.py`) | Hecha (GTX 1650, hashcat 8.0) | No tiene GPU NVIDIA | No tiene GPU NVIDIA | Pendiente (RTX 4060) |
 
 La RAM es la que reporta Windows como instalada, redondeada. Los equipos sin GPU NVIDIA no pueden correr
 `gpu_benchmark.py`, porque el script lee la GPU con `nvidia-smi`.

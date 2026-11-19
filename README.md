@@ -20,9 +20,11 @@ termodinámico de Landauer.
 | 12 caracteres | 5.7×10⁴ años | 3×10⁸ kWh | $259.256 millones |
 
 - **La longitud gana a la complejidad:** cada carácter extra multiplica el tiempo, la energía y el costo por 95.
-- **P = C·V²·f, comprobada con datos propios** en dos procesadores (C = 12.0 nF con R² = 0.986, y 9.5 nF).
+- **P = C·V²·f es consistente con nuestras mediciones** en dos procesadores (C = 12.0 nF con R² = 0.986, y 9.5 nF), con la recta pasando por el origen sin forzarla.
+- **Medimos una GPU de verdad atacando con hashcat** (GTX 1650): 16.5 GH/s con 47 W, 2.8 nJ por intento, del mismo orden que el 1.5 nJ que usamos para la RTX 4090.
 - **Frenar cambia tiempo por energía:** con un disipador malo el ataque tarda 14 % más pero gasta 17 % menos.
-- **Límite de Landauer:** recorrer una llave de 256 bits exige más energía que la que emitirá el Sol en toda su vida.
+- **El calor es un efecto de segundo orden:** cambia el tiempo en un 14 %; la longitud de la contraseña lo multiplica por 95 por carácter.
+- **Límite de Landauer:** con un computador irreversible, recorrer una llave de 256 bits exige más energía que la que emitirá el Sol en toda su vida (cota de orden de magnitud).
 
 ![Tiempo y energía del ataque según la longitud de la contraseña](figuras/ataque_vs_longitud.png)
 

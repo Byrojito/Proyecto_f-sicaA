@@ -25,7 +25,11 @@ K_FRENO = 0.10     # 1/°C: la frecuencia baja 10 % por cada grado sobre T_LIM
 
 # --- Ataque (secciones 10 y 11) ---
 ALFABETO = 95                                  # caracteres imprimibles
-VEL_HASH = {"NTLM": 3e11, "bcrypt": 2e5}       # intentos/s de una RTX 4090 a φ = 1 (benchmarks de hashcat)
+VEL_HASH = {                                   # intentos/s de una RTX 4090 a φ = 1 (hashcat 6.2.6, Chick3nman 2022)
+    "NTLM": 3e11,                              # 288.5 GH/s redondeado
+    "bcrypt costo 5": 2e5,                     # 184 kH/s redondeado; costo 5 = 32 iteraciones
+    "bcrypt costo 12": 2e5 / 2**7,             # lo que usaría un sitio bien configurado
+}
 COP = 3.0                                      # aire acondicionado real
 TARIFA = 863.61                                # COP/kWh, Enel Colombia, estrato 4, agosto de 2026
 AÑO = 3.156e7                                  # s

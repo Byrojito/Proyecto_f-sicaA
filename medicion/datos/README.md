@@ -15,6 +15,7 @@ El hardware de cada equipo está en [`../EQUIPOS.md`](../EQUIPOS.md).
 | `felipe_turbo` | ASUS TUF F15 | Turbo | Secciones 8.5, 8.6 y 9.1 (recta V contra f) |
 | `alejandra_silencio` | ASUS VivoBook 15 (i5-1135G7) | Silencio | Sección 8.7: freno térmico observado |
 | `alejandra_rendimiento` | ASUS VivoBook 15 | Rendimiento | Sección 8.7: τ de calentamiento y de enfriamiento |
+| `felipe_gpu_turbo` | GPU GTX 1650 del ASUS TUF F15 | Turbo | Sección 8.9: GPU atacando con hashcat (`_benchmark.csv` de `gpu_benchmark.py`, `_hwinfo.csv` y `_hashcat.log`) |
 
 `pruebas/` guarda corridas de prueba (60 s e interrumpida) que no se usan en el análisis.
 
