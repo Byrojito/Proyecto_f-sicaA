@@ -63,18 +63,28 @@ Protocolo para que las mediciones sean comparables:
 
 ## Panel de la presentación
 
-`presentacion/panel.html` es una sola página con tres columnas que comparten el mismo reloj:
+`presentacion/panel.html` es una sola página para mostrar en la sustentación. Arriba se escribe una
+contraseña de prueba y la página dice, en una frase, cuánto tardaría una RTX 4090 en probarlas todas, cuánto
+costaría en la factura y cómo cambia el tiempo con la longitud. Abajo, lado a lado y con el mismo reloj:
 
-1. **El ataque:** escribes una contraseña de prueba y calcula el espacio de búsqueda, el tiempo, los kWh, el costo en pesos y el piso de Landauer.
-2. **El modelo:** la GPU simulada con el mismo Euler y los mismos frenos del notebook. Tiene controles para R_th, T_amb, tope de potencia y tipo de freno.
-3. **La realidad:** nuestras mediciones de HWiNFO reproducidas al mismo ritmo, con el freno térmico y el tope de potencia marcados.
+- **El modelo:** la RTX 4090 simulada con el mismo Euler y los mismos frenos del notebook. En "Ajustar el
+  modelo" se cambian el disipador, la temperatura del cuarto, el tope de potencia y el tipo de freno.
+- **Lo que medimos:** nuestras mediciones reproducidas al mismo ritmo. Por defecto, la GTX 1650 atacando con
+  hashcat; también están las CPU de Felipe y de Alejandra, o se puede abrir cualquier CSV del benchmark.
 
-Se abre con doble clic, sin internet. Para el **modo en vivo** (la GPU atacando durante la sustentación):
+La temperatura grande cambia de color de azul a rojo a medida que el chip se calienta.
+
+**Cómo probarlo:** doble clic en `presentacion/panel.html`, escribir una contraseña y darle a *Iniciar*
+(la barra espaciadora también sirve). Funciona sin internet; con internet usa las tipografías del diseño.
+
+**Modo en vivo** (la GPU atacando durante la sustentación), en dos terminales:
 
 ```bash
 python presentacion/servidor.py            # luego abrir http://localhost:8000
-python medicion/gpu_benchmark.py --hashcat C:\hashcat\hashcat.exe --duracion 900 --nombre demo
+python medicion/gpu_benchmark.py --hashcat "C:\hashcat-8.0.0\hashcat-8.0.0\hashcat.exe" --duracion 900 --nombre demo
 ```
+
+El panel detecta la medición en curso y la muestra sola, marcada como "midiendo en vivo".
 
 Si se cambian los datos o la plantilla, se regenera con `python presentacion/generar_panel.py`.
 
@@ -103,7 +113,7 @@ figuras/              Gráficas exportadas para el póster
 fisica/               La física del notebook como paquete: térmico, potencia, frenado, ataque, Landauer
 docs/                 Ecuaciones → código, chuleta de física y documento completo
 presentacion/
-  panel.html          Panel de tres columnas para la sustentación (se abre solo)
+  panel.html          Panel para la sustentación (se abre con doble clic)
   panel_plantilla.html  Fuente del panel (sin datos)
   generar_panel.py    Incrusta las mediciones en la plantilla
   servidor.py         Sirve el panel con modo en vivo en http://localhost:8000
@@ -139,6 +149,6 @@ esté junto a su código y su interpretación.
   - [x] "Restart & Run All" corre sin errores
 - [ ] **Fase 6** — Presentación
   - [x] Demo interactiva (sección 13)
-  - [x] Panel de tres columnas con modo en vivo (`presentacion/`)
+  - [x] Panel de la sustentación con modo en vivo (`presentacion/`)
   - [ ] Póster
   - [ ] Ensayo de la sustentación

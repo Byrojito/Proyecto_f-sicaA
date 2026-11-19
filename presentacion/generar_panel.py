@@ -14,10 +14,13 @@ import numpy as np
 AQUI = os.path.dirname(os.path.abspath(__file__))
 DATOS = os.path.join(AQUI, "..", "medicion", "datos")
 
-# Mediciones que se muestran en el panel 3: (persona, modo, etiqueta)
+# Mediciones que se muestran en "Lo que medimos": (persona, modo, etiqueta)
+GPU = [
+    ("felipe", "gpu_turbo", "GPU GTX 1650 de Felipe atacando con hashcat"),
+]
 MEDICIONES = [
-    ("alejandra", "silencio", "VivoBook 15 · modo Silencio (freno térmico)"),
-    ("felipe", "turbo", "TUF F15 · modo Turbo (tope de potencia)"),
+    ("alejandra", "silencio", "CPU del portátil de Alejandra, modo Silencio"),
+    ("felipe", "turbo", "CPU del portátil de Felipe, modo Turbo"),
 ]
 
 COLUMNAS = {
@@ -71,8 +74,21 @@ def leer(quien, modo, etiqueta):
     return {"etiqueta": etiqueta, "fin_carga": fin, "serie": serie}
 
 
+def leer_gpu(quien, modo, etiqueta):
+    """El CSV de gpu_benchmark.py ya trae temperatura, potencia, velocidad y frenos."""
+    filas = list(csv.DictReader(open(os.path.join(DATOS, f"{quien}_{modo}_benchmark.csv"), encoding="utf-8")))
+    fin = max(float(r["t_s"]) for r in filas if r["fase"] == "carga")
+    serie = []
+    for r in filas:
+        g = lambda k: numero(r[k]) if r.get(k, "") != "" else None
+        serie.append([round(float(r["t_s"]), 1), g("temp_C"), g("potencia_W"), round(g("freq_MHz") or 0),
+                      int(g("freno_termico") or 0), round(g("hashes_por_s") or 0), None, int(g("freno_potencia") or 0)])
+    return {"etiqueta": etiqueta, "fin_carga": fin, "serie": serie}
+
+
 def main():
-    medidas = {f"{q}_{m}": leer(q, m, e) for q, m, e in MEDICIONES}
+    medidas = {f"{q}_{m}": leer_gpu(q, m, e) for q, m, e in GPU}
+    medidas.update({f"{q}_{m}": leer(q, m, e) for q, m, e in MEDICIONES})
     plantilla = open(os.path.join(AQUI, "panel_plantilla.html"), encoding="utf-8").read()
     html = plantilla.replace("__MEDIDAS__", json.dumps(medidas, separators=(",", ":")))
     salida = os.path.join(AQUI, "panel.html")
