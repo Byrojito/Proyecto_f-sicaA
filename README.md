@@ -97,6 +97,7 @@ Primero conviene hacer una prueba con `--duracion 60`.
 
 ## Material para la sustentación
 
+- `docs/Guia_de_repaso.pdf`: 20 páginas para entender el proyecto completo (teoría, método, mediciones, resultados), con las preguntas probables de la sustentación y qué gráficas poner en el póster.
 - `docs/Chuleta_fisica.docx`: 4 páginas, una ficha por ecuación del curso (qué dice, cómo la usamos, nuestro número). Es lo que hay que tener a mano frente al póster.
 - `docs/Fisica_del_proyecto_completo.docx`: 11 páginas con las derivaciones completas y las figuras, por si preguntan de dónde sale una ecuación.
 
