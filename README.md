@@ -143,9 +143,9 @@ esté junto a su código y su interpretación.
   - [ ] GPU del Omen de Samuel (RTX 4060 Laptop), opcional
 - [x] **Fase 4** — Costo en pesos (Enel, estrato 4), barridos de R_th y T_amb, límite de
       Landauer (≈ 215 bits / 33 caracteres aleatorios superan la energía del Sol en su vida)
-- [ ] **Fase 5** — Notebook como ensayo
-  - [x] Limitaciones y conclusiones (borrador para revisar entre los tres)
-  - [ ] Declaración de uso de IA: completar qué hizo cada integrante
+- [x] **Fase 5** — Notebook como ensayo
+  - [x] Limitaciones y conclusiones
+  - [x] Declaración de uso de IA y fuentes externas
   - [x] "Restart & Run All" corre sin errores
 - [ ] **Fase 6** — Presentación
   - [x] Demo interactiva (sección 13)
