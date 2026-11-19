@@ -33,11 +33,10 @@ termodinámico de Landauer.
 ```bash
 pip install -r requirements.txt
 jupyter notebook proyecto.ipynb      # luego: Kernel -> Restart & Run All
-pytest -v                            # 32 pruebas de la física
 ```
 
 La física también está organizada como paquete de Python en `fisica/`, con cada ecuación traducida a una
-función. La tabla que conecta ecuación, código y prueba está en
+función. La tabla que conecta cada ecuación con su código está en
 [`docs/ECUACIONES_A_CODIGO.md`](docs/ECUACIONES_A_CODIGO.md).
 
 Medición propia (portátil enchufado, unos 15 minutos):
@@ -102,7 +101,6 @@ medicion/
   datos/              CSV medidos por nosotros (qué es cada archivo: datos/README.md)
 figuras/              Gráficas exportadas para el póster
 fisica/               La física del notebook como paquete: térmico, potencia, frenado, ataque, Landauer
-tests/                Pruebas de la física y de reproducción de los resultados del notebook
 docs/                 Ecuaciones → código, chuleta de física y documento completo
 presentacion/
   panel.html          Panel de tres columnas para la sustentación (se abre solo)
