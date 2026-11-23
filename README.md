@@ -3,7 +3,7 @@
 Proyecto final de **Física A: Hardware e Información** (Universidad de los Andes).
 Profesor: Andrés Flórez.
 
-**Integrantes:** Felipe Rojas Díaz · Alejandra Rodríguez · Samuel Fonseca
+**Integrantes:** Felipe Rojas Díaz - 202414023 · Alejandra Rodríguez - 202214024 · Samuel Fonseca - 202521098
 
 Simulamos una GPU que prueba contraseñas por fuerza bruta: el chip se calienta según un
 balance de energía, se frena cuando supera su temperatura límite, y eso cambia cuánto
@@ -150,5 +150,5 @@ esté junto a su código y su interpretación.
 - [ ] **Fase 6** — Presentación
   - [x] Demo interactiva (sección 13)
   - [x] Panel de la sustentación con modo en vivo (`presentacion/`)
-  - [ ] Póster
+  - [x] Póster (Alejandra y Samuel)
   - [ ] Ensayo de la sustentación
