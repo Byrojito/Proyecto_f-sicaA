@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Póster · ¿Cuánta energía cuesta romper una contraseña?</title>
+<style>
+  @page { size: 90cm 120cm; margin: 0; }
+  :root {
+    --navy: #17324d; --ink: #111827; --muted: #4b5563; --line: #d6dbe3; --paper: #fbfaf7;
+    --termo: #c2410c; --termo-t: #fff1e8;
+    --elec: #1d4ed8; --elec-t: #eaf0fd;
+    --num: #6d28d9; --num-t: #f1ecfc;
+    --val: #b45309; --val-t: #fef6e4;
+    --cont: #475569; --cont-t: #eef2f6;
+    --seg: #0f766e; --seg-t: #e6f4f2;
+    --curso: #15803d; --curso-t: #e8f5ec;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { font-size: 25pt; }
+  body { width: 90cm; height: 120cm; background: var(--paper); color: var(--ink);
+         font-family: "Inter", "DejaVu Sans", sans-serif; line-height: 1.3; overflow: hidden; position: relative; }
+  .m { font-family: "DejaVu Serif", serif; font-style: italic; white-space: nowrap; }
+  .m b { font-style: normal; }
+  sub, sup { font-size: 0.68em; line-height: 0; }
+  code, .code { font-family: "DejaVu Sans Mono", monospace; }
+
+  /* ---------- Encabezado ---------- */
+  header { background: var(--navy); color: #fff; padding: 1.6cm 3cm 1.5cm; display: grid; grid-template-columns: 1fr 25cm; gap: 2.5cm; align-items: end; }
+  .kicker { color: #f59e0b; font-weight: 700; letter-spacing: .12em; font-size: .78rem; text-transform: uppercase; }
+  h1 { font-size: 3.55rem; line-height: 1.04; font-weight: 800; letter-spacing: -.02em; margin: .35cm 0 .55cm; }
+  .sub { font-size: 1.32rem; color: #c9d6e3; font-weight: 500; }
+  .sub b { color: #fff; font-weight: 700; }
+  .autores { margin-top: .7cm; font-size: .92rem; color: #c9d6e3; }
+  .autores b { color: #fff; }
+  .respuesta { background: rgba(255,255,255,.08); border-left: .35cm solid #f59e0b; padding: .9cm 1.1cm; border-radius: .3cm; }
+  .respuesta .k { font-size: .72rem; letter-spacing: .1em; text-transform: uppercase; color: #f59e0b; font-weight: 700; }
+  .respuesta .big { font-size: 1.85rem; font-weight: 800; line-height: 1.08; margin: .25cm 0 .3cm; }
+  .respuesta .big span { color: #fcd34d; }
+  .respuesta p { font-size: .88rem; color: #dbe4ee; }
+
+  main { padding: 1.3cm 3cm 0; }
+
+  /* ---------- Idea ---------- */
+  .idea { display: grid; grid-template-columns: 1fr 1fr; gap: 1.6cm; margin-bottom: .9cm; }
+  .idea p { font-size: 1rem; color: #1f2937; }
+  .idea p b { color: var(--navy); }
+  .leyenda { display: flex; gap: .9cm; align-items: center; font-size: .78rem; color: var(--muted); flex-wrap: wrap; }
+  .tag { display: inline-flex; align-items: center; gap: .25cm; font-weight: 700; }
+  .tag i { display: inline-block; width: .55cm; height: .55cm; border-radius: .12cm; }
+
+  /* ---------- Título de bloque ---------- */
+  h2 { font-size: 1.55rem; font-weight: 800; color: var(--navy); letter-spacing: -.01em; display: flex; align-items: baseline; gap: .6cm; margin-bottom: .55cm; }
+  h2 small { font-size: .8rem; font-weight: 500; color: var(--muted); }
+  .cabeceras { display: grid; grid-template-columns: 15.4cm 1.3cm 17.6cm 1.3cm 21cm 1fr; font-size: .66rem; font-weight: 700;
+               letter-spacing: .1em; text-transform: uppercase; color: var(--muted); padding: 0 .5cm .25cm; }
+
+  /* ---------- Filas: física del curso → código ---------- */
+  .fila { display: grid; grid-template-columns: 15.4cm 1.3cm 17.6cm 1.3cm 21cm 1fr; align-items: stretch;
+          background: #fff; border: 1px solid var(--line); border-left: .45cm solid var(--c); border-radius: .35cm;
+          margin-bottom: .5cm; min-height: 12.2cm; overflow: hidden; }
+  .fila > div { padding: .6cm .6cm; }
+  .curso { background: var(--curso-t); display: flex; flex-direction: column; gap: .3cm; }
+  .curso .sem { color: var(--curso); font-weight: 800; font-size: .74rem; letter-spacing: .06em; text-transform: uppercase; }
+  .curso .tema { font-weight: 700; font-size: .98rem; line-height: 1.15; }
+  .curso .eq { font-size: .98rem; background: #fff; border-radius: .2cm; padding: .35cm .4cm; margin-top: auto; text-align: center; }
+  .curso .nota { font-size: .7rem; color: #374151; }
+  .flecha { display: flex; align-items: center; justify-content: center; color: var(--c); font-size: 1.9rem; font-weight: 800; padding: 0 !important; }
+  .adapta { background: var(--t); display: flex; flex-direction: column; gap: .3cm; }
+  .adapta .titulo { color: var(--c); font-weight: 800; font-size: .74rem; letter-spacing: .06em; text-transform: uppercase; }
+  .adapta .eq { font-size: 1.02rem; background: #fff; border-radius: .2cm; padding: .35cm .4cm; text-align: center; border: 2px solid var(--c); }
+  .adapta p { font-size: .76rem; color: #1f2937; }
+  .adapta p b { color: var(--c); }
+  .codigo { background: #0f172a; color: #e2e8f0; display: flex; flex-direction: column; gap: .3cm; }
+  .codigo .titulo { color: #94a3b8; font-weight: 700; font-size: .66rem; letter-spacing: .08em; text-transform: uppercase; display: flex; justify-content: space-between; }
+  .codigo .titulo span { color: #fbbf24; text-transform: none; letter-spacing: 0; }
+  .codigo pre { font-family: "DejaVu Sans Mono", monospace; font-size: .64rem; line-height: 1.38; white-space: pre; }
+  .codigo .k { color: #c084fc; } .codigo .f { color: #7dd3fc; } .codigo .cm { color: #86efac; } .codigo .n { color: #fda4af; }
+  .codigo .porque { margin-top: auto; font-size: .69rem; color: #cbd5e1; border-top: 1px solid #334155; padding-top: .3cm; line-height: 1.32; }
+  .codigo .porque b { color: #fbbf24; }
+  .resultado { display: flex; flex-direction: column; gap: .25cm; padding: .45cm .55cm !important; }
+  .resultado img { width: 100%; height: 9cm; object-fit: contain; background: #fff; }
+  .resultado .num { font-size: .8rem; font-weight: 600; color: #1f2937; }
+  .resultado .num b { color: var(--c); font-size: 1.05rem; }
+
+  /* ---------- Validación ---------- */
+  .validacion { display: grid; grid-template-columns: 1fr 26cm; gap: 1cm; background: #fff; border: 1px solid var(--line); border-left: .45cm solid var(--val);
+                border-radius: .35cm; padding: .6cm .8cm; margin: .7cm 0 .8cm; }
+  .validacion h3 { font-size: 1.12rem; color: var(--val); margin-bottom: .3cm; }
+  .validacion p { font-size: .8rem; margin-bottom: .3cm; }
+  .validacion .datos { display: grid; grid-template-columns: repeat(3, 1fr); gap: .5cm; margin-top: .4cm; }
+  .dato { background: var(--val-t); border-radius: .25cm; padding: .4cm .5cm; }
+  .dato b { display: block; font-size: 1.3rem; color: var(--val); line-height: 1.1; }
+  .dato span { font-size: .64rem; color: #374151; }
+  .validacion img { width: 100%; height: 7.4cm; object-fit: contain; }
+  .pie-fig { font-size: .6rem; color: var(--muted); }
+
+  /* ---------- Cierre ---------- */
+  .cierre { display: grid; grid-template-columns: 27cm 1fr 1fr; gap: 1cm; }
+  .caja { background: #fff; border: 1px solid var(--line); border-radius: .35cm; padding: .7cm .8cm; }
+  .caja h3 { font-size: 1.05rem; color: var(--navy); margin-bottom: .35cm; }
+  table { width: 100%; border-collapse: collapse; font-size: .74rem; font-variant-numeric: tabular-nums; }
+  th { text-align: left; font-size: .62rem; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); padding: .15cm .2cm; border-bottom: 2px solid var(--navy); }
+  td { padding: .2cm .2cm; border-bottom: 1px solid var(--line); }
+  tr.dest td { background: #fef3c7; font-weight: 700; }
+  .caja p, .caja li { font-size: .72rem; }
+  .caja ul { padding-left: .6cm; display: flex; flex-direction: column; gap: .2cm; }
+  .extension { display: inline-block; font-size: .56rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: #475569; background: #eef2f6; padding: .08cm .25cm; border-radius: .12cm; margin-bottom: .25cm; }
+  .conclusion { background: var(--navy); color: #fff; border: 0; }
+  .conclusion h3 { color: #f59e0b; }
+  .conclusion p { font-size: .86rem; line-height: 1.35; color: #e5edf5; }
+  .conclusion p b { color: #fff; }
+
+  footer { position: absolute; left: 3cm; right: 3cm; bottom: 1.4cm; display: flex; justify-content: space-between; align-items: center; font-size: .62rem; color: var(--muted); }
+  footer .repo { display: flex; align-items: center; gap: .5cm; }
+  footer img { width: 3.1cm; height: 3.1cm; }
+  footer b { color: var(--ink); }
+</style>
+</head>
+<body>
+
+<header>
+  <div>
+    <div class="kicker">Física A: Hardware e Información · Universidad de los Andes · 2026-2</div>
+    <h1>¿Cuánta energía cuesta romper una contraseña por fuerza bruta?</h1>
+    <div class="sub">Cómo convertimos <b>la física del curso</b> en <b>código</b> para simular un procesador que se calienta mientras ataca.</div>
+    <div class="autores"><b>Felipe Rojas Díaz · Alejandra Rodríguez · Samuel Fonseca</b></div>
+  </div>
+  <div class="respuesta">
+    <div class="k">La respuesta corta</div>
+    <div class="big">8 caracteres: <span>6 horas</span> y <span>$3.200</span> de luz.<br>12 caracteres: <span>57.000 años</span>.</div>
+    <p>RTX 4090, contraseñas de Windows (NTLM), tarifa de Enel con aire acondicionado. Cada carácter extra multiplica todo por 95.</p>
+  </div>
+</header>
+
+<main>
+  <section class="idea">
+    <p><b>La idea.</b> Cada intento del ataque es trabajo eléctrico que termina como calor. El calor sube la temperatura del chip, el chip frena para protegerse, y eso decide cuánto tarda el ataque y cuánta energía gasta.</p>
+    <div>
+      <p style="margin-bottom:.35cm"><b>Cómo leer el póster.</b> Cada fila toma una ecuación que vimos en clase, la adapta al chip y la convierte en una función de Python.</p>
+      <div class="leyenda">
+        <span class="tag"><i style="background:var(--curso)"></i>Lo que vimos en el curso</span>
+        <span class="tag"><i style="background:#c2410c"></i>Calor</span>
+        <span class="tag"><i style="background:#1d4ed8"></i>Electricidad</span>
+        <span class="tag"><i style="background:#6d28d9"></i>Método numérico</span>
+        <span class="tag"><i style="background:#475569"></i>Ataque</span>
+      </div>
+    </div>
+  </section>
+
+  <h2>De la física del curso al código <small>cinco traducciones, en el orden en que las usa la simulación</small></h2>
+  <div class="cabeceras"><span>Lo vimos en clase</span><span></span><span>Cómo la adaptamos al chip</span><span></span><span>La función en el notebook · por qué así</span><span>Qué nos dio</span></div>
+
+  <!-- 1. RC -> chip -->
+  <div class="fila" style="--c:var(--termo); --t:var(--termo-t)">
+    <div class="curso">
+      <div class="sem">Semana 12</div>
+      <div class="tema">Circuito RC</div>
+      <div class="nota">Al cerrar el interruptor, el condensador se carga de forma gradual, con constante de tiempo τ = RC.</div>
+      <div class="eq m">RC·dV/dt + V = V<sub>0</sub></div>
+    </div>
+    <div class="flecha">→</div>
+    <div class="adapta">
+      <div class="titulo">1 · El chip es un RC térmico</div>
+      <div class="eq m">C<sub>th</sub>·dT/dt = P − (T − T<sub>amb</sub>)/R<sub>th</sub></div>
+      <p>La <b>temperatura</b> hace de voltaje, la <b>potencia</b> de corriente, el <b>disipador</b> de resistencia y la <b>masa</b> de condensador. El calor sale como la corriente por una resistencia: ΔT = R<sub>th</sub>·P (ley de Ohm, semana 11).</p>
+    </div>
+    <div class="flecha">→</div>
+    <div class="codigo">
+      <div class="titulo">Función <span>F_sin_frenado · celda 7</span></div>
+<pre><span class="k">def</span> <span class="f">F</span>(t, T):
+    <span class="cm"># dT/dt: lo que entra menos lo que sale</span>
+    <span class="k">return</span> (P - (T - T_amb) / R_th) / C_th
+
+<span class="cm"># solución exacta, como la del RC</span>
+T_amb + P * R_th * (<span class="n">1</span> - np.exp(-t / tau))</pre>
+      <div class="porque"><b>Por qué un solo nodo:</b> el sensor da una temperatura y solo hay dos parámetros, R<sub>th</sub> y C<sub>th</sub>, que podemos medir. Y al ser un RC tenemos solución exacta para validar Euler.</div>
+    </div>
+    <div class="resultado">
+      <img src="../figuras/validacion_analitica.png" alt="Calentamiento de la GPU: Euler contra la solución analítica">
+      <div class="num">Equilibrio T<sub>eq</sub> = T<sub>amb</sub> + P·R<sub>th</sub>: <b>70 °C</b> con disipador bueno, <b>106 °C</b> con uno malo.</div>
+    </div>
+  </div>
+
+  <!-- 2. Energía del condensador -> P = CV²f -->
+  <div class="fila" style="--c:var(--elec); --t:var(--elec-t)">
+    <div class="curso">
+      <div class="sem">Semana 12</div>
+      <div class="tema">Energía en el condensador</div>
+      <div class="nota">La fuente entrega CV<sub>0</sub><sup>2</sup>; el condensador guarda la mitad y la otra mitad se disipa en la resistencia.</div>
+      <div class="eq m">E<sub>fuente</sub> = C·V<sub>0</sub><sup>2</sup>,&nbsp; U = ½·C·V<sub>0</sub><sup>2</sup></div>
+    </div>
+    <div class="flecha">→</div>
+    <div class="adapta">
+      <div class="titulo">2 · La potencia del chip</div>
+      <div class="eq m">P = C·V<sup>2</sup>·f</div>
+      <p>Cada ciclo de reloj <b>carga y descarga</b> los transistores: cuesta C·V<sup>2</sup>, y hay f ciclos por segundo. Si es cierto, P contra V<sup>2</sup>f es <b>una recta por el origen</b> y su pendiente es C.</p>
+    </div>
+    <div class="flecha">→</div>
+    <div class="codigo">
+      <div class="titulo">Ajuste por mínimos cuadrados <span>celda 33</span></div>
+<pre>x = V**<span class="n">2</span> * f                 <span class="cm"># V²·f de HWiNFO</span>
+C_ef = np.sum(x * P) / np.sum(x**<span class="n">2</span>)
+<span class="cm"># recta por el origen (semanas 16 y 19)</span>
+
+<span class="cm"># control: intercepto libre</span>
+(C, b), *_ = np.linalg.lstsq(...)</pre>
+      <div class="porque"><b>Por qué por el origen:</b> la ley no tiene término constante. Para no forzarlo, también ajustamos con intercepto libre: salió b = 0,1 W ≈ 0.</div>
+    </div>
+    <div class="resultado">
+      <img src="../figuras/potencia_cv2f.png" alt="Potencia contra V²f en los tres modos del portátil de Felipe">
+      <div class="num"><b>C = 12,0 nF</b>, R² = 0,986, en tres modos de energía. Turbo: 22 % más rápido pero <b>30 % más energía</b> por intento (sube V).</div>
+    </div>
+  </div>
+
+  <!-- 3. Euler -->
+  <div class="fila" style="--c:var(--num); --t:var(--num-t)">
+    <div class="curso">
+      <div class="sem">Semanas 3, 12 y 15</div>
+      <div class="tema">Método de Euler y estabilidad</div>
+      <div class="nota">«La estabilidad numérica es tan importante como la ecuación física.»</div>
+      <div class="eq m">x<sub>n+1</sub> = x<sub>n</sub> + Δt·f(x<sub>n</sub>, t<sub>n</sub>)</div>
+    </div>
+    <div class="flecha">→</div>
+    <div class="adapta">
+      <div class="titulo">3 · Resolverlo paso a paso</div>
+      <div class="eq m">T<sub>k+1</sub> = T<sub>k</sub> + Δt·F(t<sub>k</sub>, T<sub>k</sub>)</div>
+      <p>La pendiente F es la de la fila 1. Cada paso multiplica la distancia al equilibrio por <b>(1 − Δt/τ)</b>: si Δt &gt; τ oscila y si Δt &gt; 2τ diverge.</p>
+    </div>
+    <div class="flecha">→</div>
+    <div class="codigo">
+      <div class="titulo">Función euler <span>celda 7 · programada por nosotros</span></div>
+<pre><span class="k">def</span> <span class="f">euler</span>(F, T0, dt, t_final):
+    ...
+    <span class="k">for</span> k <span class="k">in</span> range(n):
+        T[k+<span class="n">1</span>] = T[k] + dt * F(t[k], T[k])
+    <span class="k">return</span> t, T</pre>
+      <div class="porque"><b>Por qué Euler y no RK4:</b> su error (0,14 °C) es mucho menor que el del modelo frente a los datos (~3 °C). RK4 no cambiaría ninguna conclusión, y en Euler cada línea es la física.</div>
+    </div>
+    <div class="resultado">
+      <img src="../figuras/estabilidad_euler.png" alt="Estabilidad de Euler para tres pasos de tiempo">
+      <div class="num">Error <b>0,14 °C</b> con Δt = 1 s; orden 1 (pendiente <b>1,03</b>). Con freno, τ<sub>ef</sub> = 6,5 s → usamos Δt ≤ 0,5 s.</div>
+    </div>
+  </div>
+
+  <!-- 4. Protección térmica -> freno -->
+  <div class="fila" style="--c:var(--termo); --t:var(--termo-t)">
+    <div class="curso">
+      <div class="sem">Semana 7</div>
+      <div class="tema">Calor en procesadores</div>
+      <div class="nota">Si el calor no se extrae, la temperatura sube, el rendimiento baja y el procesador entra en protección térmica.</div>
+      <div class="eq m">calor → T ↑ → protección</div>
+    </div>
+    <div class="flecha">→</div>
+    <div class="adapta">
+      <div class="titulo">4 · El chip frena</div>
+      <div class="eq m">φ = mín(φ<sub>P</sub>, 1 − K·(T − 83 °C))</div>
+      <p>Dos frenos: un <b>tope de potencia</b> y uno <b>térmico</b> que baja la frecuencia φ = f/f<sub>máx</sub>. Ahora P depende de T: la ecuación de la fila 1 deja de ser lineal y <b>solo Euler</b> la resuelve.</p>
+    </div>
+    <div class="flecha">→</div>
+    <div class="codigo">
+      <div class="titulo">Regla de frenado <span>celda 52</span></div>
+<pre>phi_T = min(<span class="n">1</span>, max(PHI_MIN, <span class="n">1</span> - K*(T - T_LIM)))
+<span class="k">return</span> min(phi_P, phi_T)  <span class="cm"># el más estricto</span>
+
+F = <span class="k">lambda</span> t, T: (potencia(phi(T))
+          - (T - T_AMB) / R_th) / C_TH
+t, T = euler(F, T_AMB, dt, t_final)</pre>
+      <div class="porque"><b>Por qué proporcional y no encendido/apagado:</b> el on/off hace «temblar» la temperatura y ese temblor depende de Δt. El proporcional llega a un equilibrio estable.</div>
+    </div>
+    <div class="resultado">
+      <img src="frenado_temp.png" alt="GPU con frenado: temperatura en tres escenarios">
+      <div class="num">Temperatura en los primeros 10 minutos. Disipador malo: se estabiliza en <b>84 °C al 87,5 %</b>. Tarda 14 % más, pero gasta <b>17 % menos</b> energía.</div>
+    </div>
+  </div>
+
+  <!-- 5. Escalamiento + potencia -> ataque -->
+  <div class="fila" style="--c:var(--cont); --t:var(--cont-t)">
+    <div class="curso">
+      <div class="sem">Semanas 1 y 6</div>
+      <div class="tema">Costo de algoritmos · Potencia</div>
+      <div class="nota">El escalamiento decide si un cálculo es viable. Una batería dura su capacidad dividida por el consumo.</div>
+      <div class="eq m">T(N) ∼ 2<sup>N</sup> &nbsp;·&nbsp; P = dW/dt &nbsp;·&nbsp; t = C<sub>0</sub>/I</div>
+    </div>
+    <div class="flecha">→</div>
+    <div class="adapta">
+      <div class="titulo">5 · El ataque y su costo</div>
+      <div class="eq m">dn/dt = r·φ(T),&nbsp;&nbsp; dE/dt = P<br>hasta n = 95<sup>N</sup></div>
+      <p>Como la batería: <b>tiempo = combinaciones ÷ velocidad</b> y <b>energía = ∫P dt</b>. Pero la velocidad sale de la temperatura, así que las integramos junto con T en el mismo paso de Euler.</p>
+    </div>
+    <div class="flecha">→</div>
+    <div class="codigo">
+      <div class="titulo">Función ataque <span>celda 63</span></div>
+<pre>T += dt * (P - (T - T_AMB) / R_th) / C_TH
+n += dt * r                <span class="cm"># intentos</span>
+E += dt * P                <span class="cm"># energía</span>
+<span class="cm"># tras 20τ ya está en equilibrio:</span>
+t_resto = (total - n) / r
+kwh = E * (<span class="n">1</span> + <span class="n">1</span>/COP) / <span class="n">3.6e6</span></pre>
+      <div class="porque"><b>Por qué extrapolar tras 20τ:</b> un ataque de miles de años serían billones de pasos; después de 20τ queda e<sup>−20</sup> del transitorio. Da lo mismo que simular 7 h completas.</div>
+    </div>
+    <div class="resultado">
+      <img src="../figuras/ataque_vs_longitud.png" alt="Tiempo y energía del ataque según la longitud de la contraseña">
+      <div class="num">Rectas en escala logarítmica: cada carácter multiplica tiempo y energía por <b>95</b>. bcrypt equivale a sumar 3 o 4 caracteres.</div>
+    </div>
+  </div>
+
+  <!-- Validación -->
+  <section class="validacion">
+    <div>
+      <h3>¿Funciona con chips reales? Lo medimos.</h3>
+      <p>Pusimos a trabajar dos portátiles y registramos temperatura, potencia, voltaje y frecuencia cada segundo con HWiNFO. Con la curva de enfriamiento medimos τ; con carga y reposo, R<sub>th</sub> = ΔT/ΔP. Después le dimos al modelo de la fila 1 <b>la potencia medida</b> y comparamos su temperatura con la del sensor.</p>
+      <div class="datos">
+        <div class="dato"><b>τ = 44 s</b><span>ajuste exponencial del enfriamiento · R<sub>th</sub> = 1,22 K/W</span></div>
+        <div class="dato"><b>1 a 3 °C</b><span>error del modelo contra el sensor en carga estable</span></div>
+        <div class="dato"><b>16,5 GH/s</b><span>GPU GTX 1650 real con hashcat: 47 W, 2,8 nJ por intento</span></div>
+      </div>
+    </div>
+    <div>
+      <img src="../figuras/modelo_vs_medicion.png" alt="Temperatura medida contra la del modelo en dos portátiles">
+      <div class="pie-fig">Naranja: medido. Azul: modelo con la potencia medida. Falla en el primer minuto: el chip real tiene dos escalas de tiempo (silicio rápido, disipador lento).</div>
+    </div>
+  </section>
+
+  <!-- Cierre -->
+  <section class="cierre">
+    <div class="caja">
+      <h3>Resultado: la longitud manda</h3>
+      <table>
+        <tr><th>Contraseña (NTLM, RTX 4090)</th><th>Tiempo</th><th>Energía*</th><th>Costo (Enel)</th></tr>
+        <tr><td>6 caracteres</td><td>2,5 s</td><td>0,0004 kWh</td><td>menos de $1</td></tr>
+        <tr class="dest"><td>8 caracteres</td><td>6,1 h</td><td>3,69 kWh</td><td>$3.183</td></tr>
+        <tr><td>10 caracteres</td><td>6 años</td><td>3,3×10<sup>4</sup> kWh</td><td>$28,7 millones</td></tr>
+        <tr><td>12 caracteres</td><td>57.000 años</td><td>3×10<sup>8</sup> kWh</td><td>$259.256 millones</td></tr>
+      </table>
+      <p style="margin-top:.3cm; font-size:.6rem; color:var(--muted)">* Incluye el aire acondicionado que saca el calor del cuarto (COP = 3).</p>
+    </div>
+    <div class="caja">
+      <span class="extension">Más allá del curso</span>
+      <h3>Un piso que nada puede bajar</h3>
+      <p>Borrar un bit cuesta como mínimo <span class="m">k<sub>B</sub>T ln 2</span> (principio de Landauer). Con eso, ni la energía del Sol en toda su vida alcanza para recorrer <b>215 bits</b> (33 caracteres al azar): AES-256 es imposible por física, no por tecnología.</p>
+      <h3 style="margin-top:.45cm">Límites</h3>
+      <ul>
+        <li>Un solo cuerpo: falla en el primer minuto.</li>
+        <li>Potencia reportada por el chip: P = CV²f es <i>consistente</i>, no comprobada con un vatímetro.</li>
+        <li>Fuerza bruta pura: con diccionario, «Uniandes2026» cae en segundos.</li>
+      </ul>
+    </div>
+    <div class="caja conclusion">
+      <h3>Conclusión</h3>
+      <p>Con <b>un circuito RC, la energía de un condensador y Euler</b>, todos del curso, se puede simular un ataque real y predecir su temperatura con unos pocos grados de error.</p>
+      <p style="margin-top:.35cm">La física del chip cambia el tiempo un <b>14 %</b>; un carácter más lo multiplica por <b>95</b>. <b>Lo que protege una contraseña es su longitud.</b></p>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div>Notebook, datos y código: <b>proyecto.ipynb</b> · mediciones en <b>medicion/datos</b> · panel interactivo en <b>presentacion/panel.html</b></div>
+  <div class="repo"><div style="text-align:right">Código completo<br><b>github.com/Byrojito/Proyecto_f-sicaA</b></div><img src="qr.svg" alt="Código QR al repositorio"></div>
+</footer>
+</body>
+</html>
