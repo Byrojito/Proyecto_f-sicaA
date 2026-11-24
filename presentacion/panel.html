@@ -557,7 +557,10 @@ function dibujarTodo() {
     const val = (arr, f) => j >= 0 && arr[j] != null ? f(arr[j]) : "—";
     ponerGrados($("r-T"), j >= 0 ? r.T[j] : null);
     $("r-P").textContent = val(r.P, v => v.toFixed(1).replace(".", ",") + " W"); $("r-r").textContent = val(r.r, v => fmtR(v) + "H/s");
-    const term = r.ft && j >= 0 && r.ft[j] === 1, pot = r.fp && j >= 0 && r.fp[j] === 1;
+    // nvidia-smi marca "reposo" por instantes entre lotes de hashcat aunque la GPU siga al tope de potencia:
+    // un freno cuenta como activo si aparece en las 2 muestras anteriores o siguientes (ventana de ~5 s).
+    const cerca = arr => { if (!arr || j < 0) return false; for (let k = Math.max(0, j - 2); k <= Math.min(arr.length - 1, j + 2); k++) if (arr[k] === 1) return true; return false; };
+    const term = cerca(r.ft), pot = ahora < finR && cerca(r.fp);
     const fr = $("freno");
     fr.className = "estado " + (estado.vivo ? "vivo" : term ? "termico" : pot ? "potencia" : j >= 0 && ahora < finR ? "libre" : "");
     fr.textContent = estado.vivo ? "midiendo en vivo" : term ? "frenando por temperatura" : pot ? "frenando por potencia" : j >= 0 && ahora < finR ? "sin frenar" : ahora >= finR ? "en reposo" : "esperando";
